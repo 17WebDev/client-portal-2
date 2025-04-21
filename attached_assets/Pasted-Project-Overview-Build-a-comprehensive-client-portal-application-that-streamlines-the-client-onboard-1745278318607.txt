@@ -1,0 +1,275 @@
+Project Overview
+Build a comprehensive client portal application that streamlines the client onboarding, project management, and communication process for a software consulting firm. The application should have two sides:
+
+Admin Dashboard: For internal use by the sales team and back office manager to manage client onboarding, track project status, and monitor analytics.
+Client Portal: For clients to view project status, submit requirements, access invoices, and sign contracts.
+The application should replace the current manual process that relies on email templates with an automated system that guides clients through a structured onboarding journey.
+
+Design Requirements
+Implement using shadCN UI library (https://ui.shadcn.com/) for consistent, modern styling
+Create a clean, responsive interface similar to the provided mockups
+Use a professional color scheme with clear visual indicators for status and progress
+Technical Requirements
+Frontend
+React-based single-page application
+Responsive design with mobile support
+shadCN UI components
+Authentication system with role-based access (admin vs client)
+Backend
+RESTful API for data management
+Secure authentication and authorization
+Integration with third-party services
+Integrations
+Pipedrive (CRM)
+N8N (Workflow automation)
+Airtable (Database)
+PandaDoc (Document signing)
+Core Features
+Admin Dashboard
+1. Client Onboarding Management
+A "command center" with actions to trigger specific email sequences to leads
+Form to input new client details (name, email, phone number)
+Ability to generate login credentials for clients and send automated invitations
+Track onboarding progress for each client (completion percentage)
+2. Sales Pipeline Visualization
+Visual representation of clients at different stages in the sales process:
+Qualifying Call
+Discovery Call
+Follow-up & Clarification Call
+Free Work Delivery
+Final Presentation
+Track and display completion rates, win rates, average contract size
+3. Project Management
+Create and assign projects to clients
+Update project status and timeline
+Document upload and management
+Communication log with clients
+4. Analytics Dashboard
+Pipeline metrics (leads, conversions, win rate)
+Project status overview (on time, delayed)
+Financial metrics (average contract size, outstanding invoices)
+Client Portal
+1. Onboarding Experience
+Guided setup with clear progress indicators
+Multi-step form collection with the following information phases: Discovery Information:
+Name
+Work Email (verification)
+Phone Number
+Company Name
+Signee for contracts/decisions (Y/N)
+Legal Entity Name
+Legal Business Address
+Project goal description
+Expected business impact
+Success criteria
+Follow-up Information:
+Refined project goals
+Budget allocation
+Links to examples or existing materials
+Ideal Go-Live Date
+2. Project Visibility
+Dashboard showing all active projects
+Status indicators and progress bars
+Timeline visualization
+Documentation access
+3. Communication Center
+Notification system for updates
+Structured messaging interface for project-related communications
+History of all interactions
+4. Document Management
+Access to proposals, contracts, and deliverables
+PandaDoc integration for electronic signatures
+Invoice viewing and payment status
+User Flows
+Admin Flow
+Admin logs in to dashboard
+Creates new client profile with basic info (name, email, phone)
+System generates credentials and sends automated welcome email
+Admin tracks client's progress through onboarding
+Admin uploads deliverables and updates project status
+Admin monitors analytics on pipeline and project performance
+Client Flow
+Client receives invitation email with credentials
+Client logs in and is guided through onboarding questionnaire
+Client submits required information in stages
+Client views project dashboard with status and timeline
+Client receives notifications for updates and required actions
+Client can view and sign documents, and view invoices
+Specific Screens to Develop
+Admin Side
+Login Screen
+Main Dashboard with KPIs and overview
+Client Management Screen
+List of all clients with status
+Client creation form
+Client detail view
+Project Management Screen
+Project creation and assignment
+Status update interface
+Timeline management
+Analytics Dashboard
+Sales pipeline visualization
+Project status metrics
+Financial reporting
+Client Side
+Login Screen
+Onboarding Questionnaire (multi-step)
+Client Dashboard
+Project overview
+Status indicators
+Timeline visualization
+Document Center
+Contracts for signing
+Invoices
+Deliverables
+Communication Center
+Notifications
+Messaging interface
+Technical Implementation Details
+Data Models
+User
+ID
+Email
+Password (hashed)
+Name
+Phone
+Role (Admin, Client)
+Created At
+Last Login
+Client
+ID
+Company Name
+Legal Entity Name
+Legal Business Address
+Signee Name
+Signee Email
+Signee Phone
+Onboarding Status
+Pipeline Stage
+Created At
+Updated At
+Project
+ID
+Client ID
+Name
+Description
+Goal
+Budget
+Timeline
+Go-Live Date
+Status
+Progress Percentage
+Created At
+Updated At
+Communication
+ID
+Project ID
+Sender ID
+Recipient ID
+Message
+Type (Update, Question, Decision)
+Created At
+Read At
+Document
+ID
+Project ID
+Type (Contract, Invoice, Deliverable)
+Status (Draft, Sent, Signed)
+URL
+Created At
+Updated At
+API Endpoints
+Authentication
+POST /api/auth/login
+POST /api/auth/logout
+POST /api/auth/reset-password
+Users
+GET /api/users
+POST /api/users
+GET /api/users/
+PUT /api/users/
+DELETE /api/users/
+Clients
+GET /api/clients
+POST /api/clients
+GET /api/clients/
+PUT /api/clients/
+DELETE /api/clients/
+GET /api/clients/
+/projects
+GET /api/clients/
+/onboarding-status
+Projects
+GET /api/projects
+POST /api/projects
+GET /api/projects/
+PUT /api/projects/
+DELETE /api/projects/
+GET /api/projects/
+/documents
+GET /api/projects/
+/communications
+Documents
+GET /api/documents
+POST /api/documents
+GET /api/documents/
+PUT /api/documents/
+DELETE /api/documents/
+Analytics
+GET /api/analytics/pipeline
+GET /api/analytics/projects
+GET /api/analytics/financials
+Integration Details
+Pipedrive Integration
+Sync contacts and deals
+Update deal stages based on portal progress
+Pull contact information for new clients
+N8N Integration
+Trigger automation workflows for email sequences
+Update client status based on completed actions
+Sync data between platforms
+Airtable Integration
+Store and retrieve structured data
+Sync project details and status
+Maintain client information
+PandaDoc Integration
+Generate contracts from templates
+Send documents for electronic signature
+Track document status and completion
+Development Phases
+Phase 1: Core Framework (2 weeks)
+Setup project architecture
+Implement authentication system
+Create basic admin and client dashboards
+Establish database models and API endpoints
+Phase 2: Admin Features (2 weeks)
+Develop client management interface
+Build project tracking system
+Create communication tools
+Implement analytics dashboard
+Phase 3: Client Portal (2 weeks)
+Develop onboarding questionnaire flow
+Build project visibility features
+Create document management system
+Implement notification system
+Phase 4: Integrations (2 weeks)
+Connect with Pipedrive
+Implement N8N workflows
+Integrate with Airtable
+Add PandaDoc functionality
+Phase 5: Testing and Refinement (1 week)
+User acceptance testing
+Performance optimization
+Bug fixing
+Final design adjustments
+Delivery Requirements
+Source code on GitHub repository
+Deployment instructions
+API documentation
+User manual for both admin and client interfaces
+Training session for admin users
+Additional Notes
+The system should be scalable to accommodate future growth
+Security is a priority, especially for client data and documents
+The UI should be intuitive and require minimal training for clients
+All email communications should be branded and professional
