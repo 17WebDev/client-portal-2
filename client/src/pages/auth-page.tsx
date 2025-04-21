@@ -97,7 +97,7 @@ export default function AuthPage() {
         {/* Left side: Auth form */}
         <div className="flex-1 mb-8 lg:mb-0 lg:max-w-md lg:mr-8">
           <div className="text-center mb-6">
-            <h1 className="text-3xl font-extrabold text-gray-900">ConsultPro</h1>
+            <h1 className="text-3xl font-extrabold text-gray-900">Client Portal</h1>
             <p className="mt-2 text-sm text-gray-600">
               Your all-in-one client onboarding and project management portal
             </p>
@@ -335,7 +335,7 @@ export default function AuthPage() {
         {/* Right side: Hero section */}
         <div className="flex-1 bg-blue-600 text-white rounded-lg shadow-xl overflow-hidden hidden lg:block">
           <div className="p-12 h-full flex flex-col justify-center">
-            <h2 className="text-3xl font-bold mb-6">Welcome to ConsultPro</h2>
+            <h2 className="text-3xl font-bold mb-6">Welcome to Client Portal</h2>
             <p className="text-lg mb-6">
               The comprehensive platform for managing your consulting projects from start to finish.
             </p>
