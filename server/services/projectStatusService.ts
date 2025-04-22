@@ -36,7 +36,7 @@ export class ProjectStatusService {
     const transitions = await db
       .select()
       .from(projectStatusTransitions)
-      .where(eq(projectStatusTransitions.fromStatus, projectData.currentStatusCode));
+      .where(eq(projectStatusTransitions.fromStatus, projectData.currentStatus));
 
     // Get status details for each valid next status
     const nextStatusCodes = transitions.map(t => t.toStatus);
@@ -77,7 +77,7 @@ export class ProjectStatusService {
       .from(projectStatusData)
       .where(eq(projectStatusData.projectId, projectId));
 
-    const oldStatusCode = projectStatusInfo.currentStatusCode;
+    const oldStatusCode = projectStatusInfo.currentStatus;
     const now = new Date();
 
     // Start a transaction for updating all related records
@@ -125,12 +125,9 @@ export class ProjectStatusService {
       await tx
         .update(projectStatusData)
         .set({
-          currentStatusCode: newStatusCode,
-          currentStatusSince: now,
+          currentStatus: newStatusCode,
           currentSubStatus: null,
-          subStatusReason: null,
-          subStatusSince: null,
-          updatedAt: now
+          lastUpdatedAt: now
         })
         .where(eq(projectStatusData.projectId, projectId));
 
@@ -192,9 +189,8 @@ export class ProjectStatusService {
       .update(projectStatusData)
       .set({
         currentSubStatus: subStatus,
-        subStatusReason: reason || null,
-        subStatusSince: now,
-        updatedAt: now
+        lastUpdatedById: userId,
+        lastUpdatedAt: now
       })
       .where(eq(projectStatusData.projectId, projectId));
 
@@ -205,7 +201,7 @@ export class ProjectStatusService {
       .where(
         and(
           eq(projectStatusHistory.projectId, projectId),
-          eq(projectStatusHistory.statusCode, projectStatusInfo.currentStatusCode),
+          eq(projectStatusHistory.statusCode, projectStatusInfo.currentStatus),
           isNull(projectStatusHistory.toDate)
         )
       )
@@ -277,8 +273,7 @@ export class ProjectStatusService {
         response,
         respondedById: userId,
         respondedAt: now,
-        resolved: true,
-        updatedAt: now
+        status: "RESOLVED" 
       })
       .where(eq(projectClarifications.id, clarificationId))
       .returning();
@@ -328,8 +323,8 @@ export class ProjectStatusService {
       .set({
         healthStatus,
         healthFactors,
-        healthLastUpdated: now,
-        updatedAt: now
+        lastUpdatedById: userId,
+        lastUpdatedAt: now
       })
       .where(eq(projectStatusData.projectId, projectId));
 
