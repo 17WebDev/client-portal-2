@@ -392,7 +392,7 @@ export class ProjectStatusService {
     const [currentStatus] = await db
       .select()
       .from(projectStatusTypes)
-      .where(eq(projectStatusTypes.code, statusData.currentStatusCode));
+      .where(eq(projectStatusTypes.code, statusData.currentStatus));
 
     // Get valid next statuses
     const validNextStatuses = await this.getValidNextStatuses(projectId);
@@ -429,8 +429,7 @@ export class ProjectStatusService {
       .insert(projectStatusData)
       .values({
         projectId,
-        currentStatusCode: statusCode,
-        currentStatusSince: now,
+        currentStatus: statusCode,
         healthStatus: 'GOOD',
         healthFactors: {
           timeline: 'GOOD',
@@ -438,7 +437,8 @@ export class ProjectStatusService {
           scopeClarity: 'GOOD',
           communication: 'GOOD'
         },
-        healthLastUpdated: now
+        lastUpdatedById: userId,
+        lastUpdatedAt: now
       });
 
     // Create initial status history entry

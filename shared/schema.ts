@@ -230,7 +230,6 @@ export const projectStatusData = pgTable("project_status_data", {
 export const insertProjectStatusDataSchema = createInsertSchema(projectStatusData).omit({
   id: true,
   createdAt: true,
-  updatedAt: true,
 });
 
 export type OnboardingData = typeof onboardingData.$inferSelect;
