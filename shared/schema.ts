@@ -147,12 +147,12 @@ export const projectStatusTypes = pgTable("project_status_types", {
   description: text("description").notNull(),
   order: integer("order").notNull(), // For sorting
   category: text("category").notNull(), // 'INITIAL', 'EXECUTION', 'REVIEW', 'COMPLETION'
-  clientVisible: boolean("client_visible").notNull().default(true),
-  requiresClientAction: boolean("requires_client_action").notNull().default(false),
+  clientVisible: boolean("clientVisible").notNull().default(true),
+  requiresClientAction: boolean("requiresClientAction").notNull().default(false),
   color: text("color").notNull(),
   icon: text("icon").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });
 
 export const insertProjectStatusTypeSchema = createInsertSchema(projectStatusTypes).omit({
