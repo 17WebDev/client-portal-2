@@ -7,8 +7,17 @@ import {
   insertProjectSchema, 
   insertCommunicationSchema, 
   insertDocumentSchema, 
-  insertOnboardingDataSchema 
+  insertOnboardingDataSchema,
+  insertProjectStatusHistorySchema,
+  insertProjectClarificationSchema,
+  insertProjectStatusDataSchema
 } from "@shared/schema";
+import { 
+  projectStatusService, 
+  webhookService, 
+  notificationService, 
+  n8nService 
+} from "./services";
 import { z } from "zod";
 
 // Middleware to check if user is authenticated
