@@ -163,9 +163,10 @@ export const insertProjectStatusTypeSchema = createInsertSchema(projectStatusTyp
 
 export const projectStatusTransitions = pgTable("project_status_transitions", {
   id: serial("id").primaryKey(),
-  fromStatus: text("from_status").notNull().references(() => projectStatusTypes.code),
-  toStatus: text("to_status").notNull().references(() => projectStatusTypes.code),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  fromStatus: text("fromStatus").notNull().references(() => projectStatusTypes.code),
+  toStatus: text("toStatus").notNull().references(() => projectStatusTypes.code),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  requiresApproval: boolean("requiresApproval").default(false),
 });
 
 export const insertProjectStatusTransitionSchema = createInsertSchema(projectStatusTransitions).omit({
@@ -175,16 +176,16 @@ export const insertProjectStatusTransitionSchema = createInsertSchema(projectSta
 
 export const projectStatusHistory = pgTable("project_status_history", {
   id: serial("id").primaryKey(),
-  projectId: integer("project_id").notNull().references(() => projects.id),
-  statusCode: text("status_code").notNull().references(() => projectStatusTypes.code),
-  fromDate: timestamp("from_date").defaultNow().notNull(),
-  toDate: timestamp("to_date"),
+  projectId: integer("projectId").notNull().references(() => projects.id),
+  statusCode: text("statusCode").notNull().references(() => projectStatusTypes.code),
+  fromDate: timestamp("fromDate").defaultNow().notNull(),
+  toDate: timestamp("toDate"),
   duration: integer("duration"), // in seconds
-  changedById: integer("changed_by_id").notNull().references(() => users.id),
+  changedById: integer("changedById").notNull().references(() => users.id),
   notes: text("notes"),
-  subStatus: text("sub_status"), // e.g., 'CLARIFICATION_NEEDED', 'BLOCKED', null
-  subStatusReason: text("sub_status_reason"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  subStatus: text("subStatus"), // e.g., 'CLARIFICATION_NEEDED', 'BLOCKED', null
+  subStatusReason: text("subStatusReason"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
 export const insertProjectStatusHistorySchema = createInsertSchema(projectStatusHistory).omit({
@@ -196,40 +197,34 @@ export const insertProjectStatusHistorySchema = createInsertSchema(projectStatus
 
 export const projectClarifications = pgTable("project_clarifications", {
   id: serial("id").primaryKey(),
-  projectId: integer("project_id").notNull().references(() => projects.id),
+  projectId: integer("projectId").notNull().references(() => projects.id),
   question: text("question").notNull(),
-  requestedById: integer("requested_by_id").notNull().references(() => users.id),
-  requestedAt: timestamp("requested_at").defaultNow().notNull(),
+  requestedById: integer("requestedById").notNull().references(() => users.id),
+  requestedAt: timestamp("requestedAt").defaultNow().notNull(),
   response: text("response"),
-  respondedById: integer("responded_by_id").references(() => users.id),
-  respondedAt: timestamp("responded_at"),
-  resolved: boolean("resolved").notNull().default(false),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  respondedById: integer("respondedById").references(() => users.id),
+  respondedAt: timestamp("respondedAt"),
+  status: text("status").notNull().default("OPEN"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
 export const insertProjectClarificationSchema = createInsertSchema(projectClarifications).omit({
   id: true,
   respondedAt: true,
   createdAt: true,
-  updatedAt: true,
 });
 
 // Add new column to projects table for enhanced status tracking
 export const projectStatusData = pgTable("project_status_data", {
   id: serial("id").primaryKey(),
-  projectId: integer("project_id").notNull().references(() => projects.id).unique(),
-  currentStatusCode: text("current_status_code").notNull().references(() => projectStatusTypes.code),
-  currentStatusSince: timestamp("current_status_since").defaultNow().notNull(),
-  currentSubStatus: text("current_sub_status"), // e.g., 'CLARIFICATION_NEEDED', 'BLOCKED', null
-  subStatusReason: text("sub_status_reason"),
-  subStatusSince: timestamp("sub_status_since"),
-  estimatedTimeline: jsonb("estimated_timeline"), // Map of status codes to estimated dates
-  healthStatus: text("health_status").notNull().default("GOOD"), // 'EXCELLENT', 'GOOD', 'AT_RISK', 'CRITICAL'
-  healthFactors: jsonb("health_factors"), // Object with timeline, budget, scopeClarity, communication statuses
-  healthLastUpdated: timestamp("health_last_updated").defaultNow().notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  projectId: integer("projectId").notNull().references(() => projects.id).unique(),
+  currentStatus: text("currentStatus").notNull().references(() => projectStatusTypes.code),
+  currentSubStatus: text("currentSubStatus"), // e.g., 'CLARIFICATION_NEEDED', 'BLOCKED', null
+  healthStatus: text("healthStatus").notNull().default("GOOD"), // 'EXCELLENT', 'GOOD', 'AT_RISK', 'CRITICAL'
+  healthFactors: jsonb("healthFactors"), // Object with timeline, budget, scopeClarity, communication statuses
+  lastUpdatedById: integer("lastUpdatedById").references(() => users.id),
+  lastUpdatedAt: timestamp("lastUpdatedAt").defaultNow(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
 export const insertProjectStatusDataSchema = createInsertSchema(projectStatusData).omit({
