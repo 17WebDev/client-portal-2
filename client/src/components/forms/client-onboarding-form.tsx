@@ -47,6 +47,7 @@ const projectDetailsSchema = z.object({
   projectGoal: z.string().min(10, "Project goal description is required"),
   businessImpact: z.string().min(10, "Business impact description is required"),
   successCriteria: z.string().min(10, "Success criteria is required"),
+  successfulEngagement: z.string().min(10, "Successful engagement description is required"),
   budget: z.string().optional(),
   timeline: z.string().optional(),
   goLiveDate: z.string().optional(),
@@ -98,6 +99,7 @@ export function ClientOnboardingForm({ clientId }: { clientId: number }) {
       projectGoal: "",
       businessImpact: "",
       successCriteria: "",
+      successfulEngagement: "",
       budget: "",
       timeline: "",
       goLiveDate: "",
@@ -399,7 +401,7 @@ export function ClientOnboardingForm({ clientId }: { clientId: number }) {
                           <FormLabel>Project Goal</FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="Describe the main goal of your project"
+                              placeholder="Example: The goal of our MVP build is to develop a software solution that streamlines business operations while significantly reducing manual processes in order to shorten the time needed to complete the operations."
                               className="min-h-[120px]"
                               {...field}
                             />
@@ -419,7 +421,7 @@ export function ClientOnboardingForm({ clientId }: { clientId: number }) {
                           <FormLabel>Expected Business Impact</FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="How will this project impact your business?"
+                              placeholder="Example: Implementing this Integrated Role would significantly enhance our technical capabilities, allowing us to accelerate product development by approximately 30%."
                               className="min-h-[120px]"
                               {...field}
                             />
@@ -439,7 +441,27 @@ export function ClientOnboardingForm({ clientId }: { clientId: number }) {
                           <FormLabel>Success Criteria</FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="How will we measure the success of this project?"
+                              placeholder="Example: Implementing this Integrated Role would significantly enhance our technical capabilities, allowing us to accelerate product development by approximately 30%."
+                              className="min-h-[120px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="sm:col-span-6">
+                    <FormField
+                      control={projectDetailsForm.control}
+                      name="successfulEngagement"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>What would successful engagement look like to you?</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Example: Successful engagement would be to build feature X, which allows users to do Y, which will increase revenue by Z."
                               className="min-h-[120px]"
                               {...field}
                             />
