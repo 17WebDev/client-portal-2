@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -118,7 +118,7 @@ export function ClientOnboardingForm({ clientId }: { clientId: number }) {
   });
 
   // Populate forms with existing data when it loads
-  React.useEffect(() => {
+  useEffect(() => {
     if (onboardingStatus?.phases) {
       // Set current phase based on completion status
       const basicInfoData = findPhaseData("basic_info");
@@ -230,7 +230,7 @@ export function ClientOnboardingForm({ clientId }: { clientId: number }) {
         ? "current"
         : "upcoming",
     },
-  ] as const;
+  ];
 
   return (
     <div className="space-y-6">
