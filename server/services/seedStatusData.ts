@@ -16,17 +16,17 @@ export async function seedProjectStatusTypes(): Promise<void> {
   console.log("Seeding project status types and transitions...");
 
   // Define status types with their details
-  const statusTypes: InsertProjectStatusType[] = [
+  const statusTypes = [
     {
-      code: "SCOPING",
-      name: "Scoping",
-      description: "Defining the project scope and requirements",
-      order: 10,
-      category: "INITIAL",
-      clientVisible: true,
-      requiresClientAction: false,
-      color: "#3498db", // Blue
-      icon: "scroll"
+      "code": "SCOPING",
+      "name": "Scoping",
+      "description": "Defining the project scope and requirements",
+      "order": 10,
+      "category": "INITIAL",
+      "clientVisible": true,
+      "requiresClientAction": false,
+      "color": "#3498db", // Blue
+      "icon": "scroll"
     },
     {
       code: "REVIEWING",
