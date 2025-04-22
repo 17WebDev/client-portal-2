@@ -1,0 +1,1084 @@
+# Complete Project Status System for Client Portal
+
+## Comprehensive Project Status Workflow
+
+Implement a complete project status workflow that guides both the internal team and clients through every phase of the project lifecycle:
+
+### Initial Phase
+1. **Scoping**
+   - Initial project assessment and planning
+   - Requirements gathering and documentation
+   - Effort estimation and resource planning
+   - Sub-status: **Clarification Needed** (when more information is required)
+
+2. **Reviewing Project**
+   - Thorough review of scoping documents and requirements
+   - Technical feasibility analysis
+   - Sub-status: **Clarification Needed** (when details need clarification)
+   
+3. **Proposal Phase**
+   - Solution design
+   - Cost and timeline estimation
+   - Presentation preparation
+   
+4. **Approved**
+   - Project has been approved by both parties
+   - Contracts signed
+   - Ready to begin implementation
+
+### Execution Phase
+5. **Setting Up**
+   - Project environment configuration
+   - Team assembly
+   - Initial repository setup
+   - Kickoff meeting scheduling
+   
+6. **Project in Progress**
+   - Active development phase
+   - Breakdown into sprints/milestones
+   - Sub-status: **Clarification Needed** (when decisions required)
+   - Sub-status: **Blocked** (when progress cannot continue)
+   
+7. **On Hold**
+   - Project temporarily paused
+   - Include reason (client request, payment issue, resource constraints)
+   - Display estimated resume date
+   
+8. **Revision Required**
+   - Changes needed based on client feedback
+   - Track revision round number
+   - Impact on timeline displayed
+
+### Review Phase
+9. **Internal Review**
+   - Team quality assessment before client review
+   - Testing and bug fixing
+   - Documentation preparation
+   
+10. **Ready for Client Review**
+    - Deliverable ready for client feedback
+    - Demo/walkthrough preparation
+    - Acceptance criteria highlighted
+    
+11. **UAT/Testing**
+    - Client testing period
+    - Track test results and feedback
+    - Bug tracking and resolution
+    
+12. **Deployment Preparation**
+    - Final steps before going live
+    - Pre-launch checklist
+    - Backup procedures
+
+### Completion Phase
+13. **Deployed**
+    - Solution has been deployed to production
+    - Waiting for final client sign-off
+    
+14. **Completed**
+    - Project has been finalized and accepted
+    - All deliverables provided
+    - Final documentation delivered
+    
+15. **Maintenance**
+    - Post-completion support phase
+    - Track ongoing maintenance tasks
+    - Regular health check schedule
+
+## Status Transition Rules
+
+Define clear rules for valid status transitions to maintain workflow integrity:
+
+```javascript
+const validTransitions = {
+  'SCOPING': ['REVIEWING', 'ON_HOLD'],
+  'REVIEWING': ['SCOPING', 'PROPOSAL_PHASE', 'ON_HOLD'],
+  'PROPOSAL_PHASE': ['REVIEWING', 'APPROVED', 'ON_HOLD'],
+  'APPROVED': ['SETTING_UP', 'ON_HOLD'],
+  'SETTING_UP': ['PROJECT_IN_PROGRESS', 'ON_HOLD'],
+  'PROJECT_IN_PROGRESS': ['INTERNAL_REVIEW', 'REVISION_REQUIRED', 'ON_HOLD'],
+  'ON_HOLD': ['SCOPING', 'REVIEWING', 'PROPOSAL_PHASE', 'APPROVED', 'SETTING_UP', 'PROJECT_IN_PROGRESS', 'INTERNAL_REVIEW'],
+  'REVISION_REQUIRED': ['PROJECT_IN_PROGRESS', 'ON_HOLD'],
+  'INTERNAL_REVIEW': ['PROJECT_IN_PROGRESS', 'READY_FOR_CLIENT_REVIEW', 'ON_HOLD'],
+  'READY_FOR_CLIENT_REVIEW': ['UAT_TESTING', 'REVISION_REQUIRED', 'ON_HOLD'],
+  'UAT_TESTING': ['DEPLOYMENT_PREPARATION', 'REVISION_REQUIRED', 'ON_HOLD'],
+  'DEPLOYMENT_PREPARATION': ['DEPLOYED', 'REVISION_REQUIRED', 'ON_HOLD'],
+  'DEPLOYED': ['COMPLETED', 'REVISION_REQUIRED', 'ON_HOLD'],
+  'COMPLETED': ['MAINTENANCE'],
+  'MAINTENANCE': ['COMPLETED', 'SCOPING'] // Can cycle back to scoping for new features
+};
+```
+
+## Enhanced Dashboard UI Components
+
+### 1. Project Status Journey Map
+Create a visual journey map that shows:
+- All possible project statuses
+- Current status highlighted
+- Completed statuses with timestamps
+- Future statuses with estimated dates
+- Clickable nodes for status details
+
+```jsx
+const ProjectJourneyMap = ({ project }) => {
+  const [expandedStatus, setExpandedStatus] = useState(null);
+  
+  const allStatuses = [
+    { id: 'SCOPING', label: 'Scoping', icon: 'DocumentIcon' },
+    { id: 'REVIEWING', label: 'Reviewing', icon: 'SearchIcon' },
+    { id: 'PROPOSAL_PHASE', label: 'Proposal', icon: 'PresentationIcon' },
+    { id: 'APPROVED', label: 'Approved', icon: 'CheckIcon' },
+    { id: 'SETTING_UP', label: 'Setting Up', icon: 'SettingsIcon' },
+    { id: 'PROJECT_IN_PROGRESS', label: 'In Progress', icon: 'ConstructionIcon' },
+    // Include all statuses...
+  ];
+  
+  const currentStatusIndex = allStatuses.findIndex(s => s.id === project.status);
+  
+  return (
+    <div className="journey-map">
+      <div className="timeline">
+        {allStatuses.map((status, index) => {
+          const isCompleted = project.statusHistory[status.id] != null;
+          const isCurrent = status.id === project.status;
+          
+          return (
+            <div 
+              key={status.id}
+              className={`status-node ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}`}
+              onClick={() => setExpandedStatus(status.id === expandedStatus ? null : status.id)}
+            >
+              <div className="node-icon">
+                <DynamicIcon name={status.icon} />
+              </div>
+              <div className="node-label">{status.label}</div>
+              {isCompleted && (
+                <div className="node-date">{formatDate(project.statusHistory[status.id])}</div>
+              )}
+              
+              {expandedStatus === status.id && (
+                <div className="status-details-popup">
+                  <h4>{status.label}</h4>
+                  <p>{getStatusDescription(status.id)}</p>
+                  {isCompleted && (
+                    <div className="status-history">
+                      <p>Completed on {formatDate(project.statusHistory[status.id])}</p>
+                      <p>Duration: {calculateDuration(status.id, project)}</p>
+                    </div>
+                  )}
+                  {isCurrent && project.subStatus !== 'NONE' && (
+                    <div className="sub-status-alert">
+                      <AlertIcon /> {formatSubStatus(project.subStatus)}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+```
+
+### 2. Project Health Indicators
+Add visual indicators for project health based on multiple factors:
+
+```jsx
+const ProjectHealthIndicator = ({ project }) => {
+  const health = calculateProjectHealth(project);
+  
+  return (
+    <div className="health-indicator">
+      <h3>Project Health</h3>
+      <div className={`health-status ${health.status.toLowerCase()}`}>
+        {health.status === 'EXCELLENT' && <StarIcon />}
+        {health.status === 'GOOD' && <ThumbsUpIcon />}
+        {health.status === 'AT_RISK' && <WarningIcon />}
+        {health.status === 'CRITICAL' && <AlertIcon />}
+        <span>{health.status}</span>
+      </div>
+      
+      <div className="health-factors">
+        {health.factors.map(factor => (
+          <div 
+            key={factor.name}
+            className={`health-factor ${factor.status.toLowerCase()}`}
+          >
+            <span className="factor-name">{factor.name}</span>
+            <span className="factor-indicator"></span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Helper function to calculate project health
+function calculateProjectHealth(project) {
+  const factors = [
+    { 
+      name: 'Timeline', 
+      status: isOnSchedule(project) ? 'GOOD' : 'AT_RISK' 
+    },
+    { 
+      name: 'Budget', 
+      status: isWithinBudget(project) ? 'GOOD' : 'AT_RISK' 
+    },
+    { 
+      name: 'Scope Clarity', 
+      status: hasClearScope(project) ? 'GOOD' : 'AT_RISK' 
+    },
+    { 
+      name: 'Communication', 
+      status: hasRecentCommunication(project) ? 'GOOD' : 'AT_RISK' 
+    }
+  ];
+  
+  // Determine overall health based on factors
+  const criticalFactors = factors.filter(f => f.status === 'CRITICAL').length;
+  const atRiskFactors = factors.filter(f => f.status === 'AT_RISK').length;
+  
+  let status = 'EXCELLENT';
+  if (criticalFactors > 0) {
+    status = 'CRITICAL';
+  } else if (atRiskFactors > 1) {
+    status = 'AT_RISK';
+  } else if (atRiskFactors === 1) {
+    status = 'GOOD';
+  }
+  
+  return { status, factors };
+}
+```
+
+### 3. Required Actions Panel
+Display a prominent panel for action items requiring client input:
+
+```jsx
+const RequiredActionsPanel = ({ project, onActionComplete }) => {
+  const actions = getRequiredClientActions(project);
+  
+  if (actions.length === 0) {
+    return (
+      <div className="required-actions empty">
+        <CheckCircleIcon size={24} />
+        <p>No actions required at this time</p>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="required-actions">
+      <h3>Action Required</h3>
+      <div className="action-list">
+        {actions.map(action => (
+          <div key={action.id} className="action-item">
+            <div className="action-header">
+              <h4>{action.title}</h4>
+              <span className={`priority ${action.priority.toLowerCase()}`}>
+                {action.priority}
+              </span>
+            </div>
+            <p>{action.description}</p>
+            <div className="action-meta">
+              <span>Due: {formatDate(action.dueDate)}</span>
+              {action.dueDate < new Date() && (
+                <span className="overdue">Overdue</span>
+              )}
+            </div>
+            <div className="action-buttons">
+              <button 
+                className="primary-button"
+                onClick={() => action.actionHandler()}
+              >
+                {action.actionLabel}
+              </button>
+              
+              {action.type === 'CLARIFICATION' && (
+                <button 
+                  className="secondary-button"
+                  onClick={() => onActionComplete(action.id)}
+                >
+                  Mark as Addressed
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+```
+
+## Enhanced Notification System
+
+### 1. Multi-channel Notification Matrix
+
+Create a comprehensive notification matrix that maps project events to notification channels:
+
+```javascript
+const notificationMatrix = {
+  'STATUS_CHANGE': {
+    importance: 'HIGH',
+    channels: ['EMAIL', 'SMS', 'IN_APP'],
+    templates: {
+      email: 'status-change-email',
+      sms: 'status-change-sms',
+      inApp: 'status-change-in-app'
+    },
+    aggregable: false
+  },
+  'CLARIFICATION_REQUESTED': {
+    importance: 'HIGH',
+    channels: ['EMAIL', 'SMS', 'IN_APP'],
+    templates: {
+      email: 'clarification-requested-email',
+      sms: 'clarification-requested-sms',
+      inApp: 'clarification-requested-in-app'
+    },
+    aggregable: false
+  },
+  'DOCUMENT_UPLOADED': {
+    importance: 'MEDIUM',
+    channels: ['EMAIL', 'IN_APP'],
+    templates: {
+      email: 'document-uploaded-email',
+      inApp: 'document-uploaded-in-app'
+    },
+    aggregable: true
+  },
+  'COMMENT_ADDED': {
+    importance: 'MEDIUM',
+    channels: ['EMAIL', 'IN_APP'],
+    templates: {
+      email: 'comment-added-email',
+      inApp: 'comment-added-in-app'
+    },
+    aggregable: true
+  },
+  'APPROACHING_DEADLINE': {
+    importance: 'HIGH',
+    channels: ['EMAIL', 'SMS', 'IN_APP'],
+    templates: {
+      email: 'approaching-deadline-email',
+      sms: 'approaching-deadline-sms',
+      inApp: 'approaching-deadline-in-app'
+    },
+    aggregable: false
+  },
+  'WEEKLY_SUMMARY': {
+    importance: 'LOW',
+    channels: ['EMAIL'],
+    templates: {
+      email: 'weekly-summary-email'
+    },
+    aggregable: false,
+    scheduled: true
+  }
+};
+```
+
+### 2. Smart Notification Timing
+
+Implement intelligent notification timing based on client preferences and behavior:
+
+```javascript
+class NotificationScheduler {
+  async scheduleNotification(notification, client) {
+    // Get client's timezone and preferences
+    const clientPreferences = await this.getClientPreferences(client.id);
+    
+    // Check if notification should be delivered now or delayed
+    if (this.shouldDelayNotification(notification, clientPreferences)) {
+      // Schedule for client's optimal time
+      const optimalTime = this.calculateOptimalDeliveryTime(clientPreferences);
+      return this.queueNotification(notification, optimalTime);
+    } else {
+      // Send immediately
+      return this.sendNotification(notification);
+    }
+  }
+  
+  shouldDelayNotification(notification, preferences) {
+    // Don't delay high importance notifications
+    if (notification.importance === 'HIGH') return false;
+    
+    // Check if current time is within quiet hours
+    const clientLocalTime = this.convertToClientLocalTime(new Date(), preferences.timezone);
+    const isQuietHours = this.isWithinQuietHours(clientLocalTime, preferences.quietHours);
+    
+    return isQuietHours;
+  }
+  
+  calculateOptimalDeliveryTime(preferences) {
+    // Get current time in client's timezone
+    const now = this.convertToClientLocalTime(new Date(), preferences.timezone);
+    
+    // If in quiet hours, schedule for end of quiet hours
+    if (this.isWithinQuietHours(now, preferences.quietHours)) {
+      return this.getQuietHoursEnd(now, preferences.quietHours);
+    }
+    
+    // If outside working hours, schedule for start of next working hours
+    if (!this.isWithinWorkingHours(now, preferences.workingHours)) {
+      return this.getNextWorkingHoursStart(now, preferences.workingHours);
+    }
+    
+    // Otherwise, send now
+    return now;
+  }
+}
+```
+
+### 3. Notification Aggregation
+
+Implement notification bundling to prevent overwhelming clients:
+
+```javascript
+class NotificationAggregator {
+  async aggregateNotifications(clientId, timeWindow = 30) { // minutes
+    // Get recent notifications that can be aggregated
+    const recentNotifications = await NotificationModel.find({
+      clientId,
+      createdAt: { $gte: new Date(Date.now() - timeWindow * 60 * 1000) },
+      sent: false,
+      aggregable: true
+    });
+    
+    // Group by type
+    const groupedNotifications = {};
+    recentNotifications.forEach(notification => {
+      if (!groupedNotifications[notification.type]) {
+        groupedNotifications[notification.type] = [];
+      }
+      groupedNotifications[notification.type].push(notification);
+    });
+    
+    // Create aggregated notifications
+    const aggregatedNotifications = [];
+    
+    for (const [type, notifications] of Object.entries(groupedNotifications)) {
+      if (notifications.length > 1) {
+        // Create an aggregated notification
+        const aggregated = {
+          type: `${type}_AGGREGATED`,
+          count: notifications.length,
+          projectId: notifications[0].projectId, // Assuming same project
+          items: notifications.map(n => ({
+            id: n.id,
+            title: n.title,
+            content: n.content
+          }))
+        };
+        
+        aggregatedNotifications.push(aggregated);
+        
+        // Mark individual notifications as aggregated
+        await NotificationModel.updateMany(
+          { _id: { $in: notifications.map(n => n._id) } },
+          { $set: { aggregated: true, sent: true } }
+        );
+      } else if (notifications.length === 1) {
+        // Single notification, just send as is
+        aggregatedNotifications.push(notifications[0]);
+      }
+    }
+    
+    return aggregatedNotifications;
+  }
+}
+```
+
+## Client Notification Preferences UI
+
+Create a comprehensive notification preferences page for clients:
+
+```jsx
+const NotificationPreferences = ({ client, onSave }) => {
+  const [preferences, setPreferences] = useState({
+    channels: {
+      email: true,
+      sms: true,
+      inApp: true
+    },
+    events: {
+      STATUS_CHANGE: true,
+      CLARIFICATION_REQUESTED: true,
+      DOCUMENT_UPLOADED: true,
+      COMMENT_ADDED: true,
+      APPROACHING_DEADLINE: true,
+      WEEKLY_SUMMARY: true
+    },
+    quietHours: {
+      enabled: false,
+      start: '22:00',
+      end: '08:00'
+    },
+    workingHours: {
+      enabled: true,
+      start: '09:00',
+      end: '17:00',
+      workDays: [1, 2, 3, 4, 5] // Monday to Friday
+    },
+    summaryFrequency: 'WEEKLY'
+  });
+  
+  const toggleChannel = (channel) => {
+    setPreferences({
+      ...preferences,
+      channels: {
+        ...preferences.channels,
+        [channel]: !preferences.channels[channel]
+      }
+    });
+  };
+  
+  const toggleEvent = (event) => {
+    setPreferences({
+      ...preferences,
+      events: {
+        ...preferences.events,
+        [event]: !preferences.events[event]
+      }
+    });
+  };
+  
+  return (
+    <div className="notification-preferences">
+      <h2>Notification Preferences</h2>
+      
+      <section className="preference-section">
+        <h3>Notification Channels</h3>
+        <div className="channel-toggles">
+          <div className="toggle-item">
+            <label>
+              <input 
+                type="checkbox" 
+                checked={preferences.channels.email}
+                onChange={() => toggleChannel('email')}
+              />
+              Email Notifications
+            </label>
+          </div>
+          <div className="toggle-item">
+            <label>
+              <input 
+                type="checkbox" 
+                checked={preferences.channels.sms}
+                onChange={() => toggleChannel('sms')}
+              />
+              SMS Notifications
+            </label>
+          </div>
+          <div className="toggle-item">
+            <label>
+              <input 
+                type="checkbox" 
+                checked={preferences.channels.inApp}
+                onChange={() => toggleChannel('inApp')}
+              />
+              In-App Notifications
+            </label>
+          </div>
+        </div>
+      </section>
+      
+      <section className="preference-section">
+        <h3>Notification Events</h3>
+        <div className="event-toggles">
+          {Object.entries(preferences.events).map(([event, enabled]) => (
+            <div key={event} className="toggle-item">
+              <label>
+                <input 
+                  type="checkbox" 
+                  checked={enabled}
+                  onChange={() => toggleEvent(event)}
+                />
+                {formatEventName(event)}
+              </label>
+            </div>
+          ))}
+        </div>
+      </section>
+      
+      <section className="preference-section">
+        <h3>Quiet Hours</h3>
+        <div className="quiet-hours-config">
+          <div className="toggle-item">
+            <label>
+              <input 
+                type="checkbox" 
+                checked={preferences.quietHours.enabled}
+                onChange={() => setPreferences({
+                  ...preferences,
+                  quietHours: {
+                    ...preferences.quietHours,
+                    enabled: !preferences.quietHours.enabled
+                  }
+                })}
+              />
+              Enable Quiet Hours
+            </label>
+          </div>
+          
+          {preferences.quietHours.enabled && (
+            <div className="time-range">
+              <div className="time-input">
+                <label>Start</label>
+                <input 
+                  type="time" 
+                  value={preferences.quietHours.start}
+                  onChange={(e) => setPreferences({
+                    ...preferences,
+                    quietHours: {
+                      ...preferences.quietHours,
+                      start: e.target.value
+                    }
+                  })}
+                />
+              </div>
+              <div className="time-input">
+                <label>End</label>
+                <input 
+                  type="time" 
+                  value={preferences.quietHours.end}
+                  onChange={(e) => setPreferences({
+                    ...preferences,
+                    quietHours: {
+                      ...preferences.quietHours,
+                      end: e.target.value
+                    }
+                  })}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+      
+      <section className="preference-section">
+        <h3>Summary Frequency</h3>
+        <div className="frequency-selector">
+          <select
+            value={preferences.summaryFrequency}
+            onChange={(e) => setPreferences({
+              ...preferences,
+              summaryFrequency: e.target.value
+            })}
+          >
+            <option value="DAILY">Daily Summary</option>
+            <option value="WEEKLY">Weekly Summary</option>
+            <option value="BIWEEKLY">Bi-Weekly Summary</option>
+            <option value="MONTHLY">Monthly Summary</option>
+            <option value="NONE">No Summary</option>
+          </select>
+        </div>
+      </section>
+      
+      <div className="preferences-actions">
+        <button className="primary-button" onClick={() => onSave(preferences)}>
+          Save Preferences
+        </button>
+      </div>
+    </div>
+  );
+};
+```
+
+## Enhanced Data Models for Status Tracking
+
+### Project Status Model
+```javascript
+{
+  id: String,
+  name: String,
+  code: String, // e.g., 'SCOPING'
+  description: String,
+  order: Number, // For sorting
+  category: String, // 'INITIAL', 'EXECUTION', 'REVIEW', 'COMPLETION'
+  allowedNextStatuses: [String], // Codes of valid next statuses
+  defaultNextStatus: String,
+  clientVisible: Boolean,
+  requiresClientAction: Boolean,
+  color: String, // For UI representation
+  icon: String // Icon name for UI
+}
+```
+
+### Project Model with Enhanced Status Tracking
+```javascript
+{
+  id: String,
+  clientId: String,
+  name: String,
+  description: String,
+  status: {
+    current: {
+      code: String, // Current status code
+      since: Date, // When this status was set
+      setBy: String, // User ID
+      notes: String // Optional notes about this status
+    },
+    subStatus: {
+      code: String, // e.g., 'CLARIFICATION_NEEDED'
+      since: Date,
+      reason: String
+    },
+    history: [
+      {
+        code: String, // Status code
+        from: Date,
+        to: Date,
+        duration: Number, // In milliseconds
+        setBy: String,
+        notes: String
+      }
+    ],
+    timeline: {
+      estimated: {
+        // Map of status codes to estimated dates
+        'SCOPING': Date,
+        'REVIEWING': Date,
+        // ... other statuses
+        'COMPLETED': Date
+      },
+      actual: {
+        // Map of status codes to actual dates
+        'SCOPING': Date,
+        'REVIEWING': Date,
+        // ... for completed statuses
+      }
+    },
+    clarifications: [
+      {
+        id: String,
+        question: String,
+        requestedBy: String,
+        requestedAt: Date,
+        response: String,
+        respondedAt: Date,
+        resolved: Boolean
+      }
+    ]
+  },
+  health: {
+    overall: String, // 'EXCELLENT', 'GOOD', 'AT_RISK', 'CRITICAL'
+    factors: {
+      timeline: String,
+      budget: String,
+      scopeClarity: String,
+      communication: String
+    },
+    lastUpdated: Date
+  },
+  // ... other project fields
+}
+```
+
+## Integration with External Systems
+
+### Notification Webhook Service
+Create a webhook service to send status updates to external systems:
+
+```javascript
+class WebhookNotifier {
+  async notifyExternalSystems(project, statusChange) {
+    // Get registered webhooks for this client/project
+    const webhooks = await WebhookModel.find({
+      clientId: project.clientId,
+      eventTypes: { $in: ['STATUS_CHANGE', 'ALL'] }
+    });
+    
+    if (webhooks.length === 0) return;
+    
+    // Prepare payload
+    const payload = {
+      event: 'STATUS_CHANGE',
+      projectId: project.id,
+      projectName: project.name,
+      previousStatus: statusChange.fromStatus,
+      newStatus: statusChange.toStatus,
+      timestamp: new Date(),
+      actor: statusChange.changedBy,
+      notes: statusChange.notes
+    };
+    
+    // Send to all registered webhooks
+    const promises = webhooks.map(webhook => 
+      axios.post(webhook.url, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Webhook-Signature': this.generateSignature(payload, webhook.secret)
+        }
+      }).catch(error => {
+        console.error(`Failed to send webhook to ${webhook.url}:`, error);
+        return this.logWebhookFailure(webhook.id, error);
+      })
+    );
+    
+    return Promise.allSettled(promises);
+  }
+  
+  generateSignature(payload, secret) {
+    // Create HMAC signature for webhook verification
+    const hmac = crypto.createHmac('sha256', secret);
+    hmac.update(JSON.stringify(payload));
+    return hmac.digest('hex');
+  }
+  
+  async logWebhookFailure(webhookId, error) {
+    return WebhookDeliveryModel.create({
+      webhookId,
+      success: false,
+      statusCode: error.response?.status || 0,
+      error: error.message,
+      timestamp: new Date()
+    });
+  }
+}
+```
+
+### N8N Integration for Automated Workflows
+Set up specific workflow triggers for N8N:
+
+```javascript
+// Example of a specialized N8N notifier
+class N8nWorkflowTrigger {
+  constructor(apiUrl, apiKey) {
+    this.apiUrl = apiUrl;
+    this.apiKey = apiKey;
+  }
+  
+  async triggerStatusChangeWorkflow(project, statusChange) {
+    const workflowEndpoint = `${this.apiUrl}/webhook/${project.status}`;
+    
+    const payload = {
+      project: {
+        id: project.id,
+        name: project.name,
+        client: {
+          id: project.clientId,
+          name: project.clientName
+        }
+      },
+      status: {
+        previous: statusChange.fromStatus,
+        current: statusChange.toStatus,
+        changedAt: new Date(),
+        changedBy: {
+          id: statusChange.changedBy,
+          name: statusChange.changedByName
+        }
+      },
+      timeline: {
+        startDate: project.startDate,
+        estimatedCompletionDate: project.estimatedCompletionDate
+      }
+    };
+    
+    try {
+      const response = await axios.post(workflowEndpoint, payload, {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      return {
+        success: true,
+        workflowId: response.data.executionId
+      };
+    } catch (error) {
+      console.error('Failed to trigger N8N workflow:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+}
+```
+
+## Implementation in Replit
+
+### Backend Status Management Service
+```javascript
+// server/services/projectStatusService.js
+
+const ProjectModel = require('../models/Project');
+const StatusChangeModel = require('../models/StatusChange');
+const NotificationService = require('./notificationService');
+const WebhookService = require('./webhookService');
+const N8nService = require('./n8nService');
+
+class ProjectStatusService {
+  constructor() {
+    this.notificationService = new NotificationService();
+    this.webhookService = new WebhookService();
+    this.n8nService = new N8nService();
+  }
+  
+  async getValidNextStatuses(projectId) {
+    const project = await ProjectModel.findById(projectId);
+    if (!project) throw new Error('Project not found');
+    
+    const currentStatus = project.status.current.code;
+    const statusModel = await StatusModel.findOne({ code: currentStatus });
+    
+    return statusModel.allowedNextStatuses;
+  }
+  
+  async updateStatus(projectId, newStatusCode, notes = '', userId) {
+    // Validate the status transition
+    const validNextStatuses = await this.getValidNextStatuses(projectId);
+    if (!validNextStatuses.includes(newStatusCode)) {
+      throw new Error(`Invalid status transition from ${currentStatus} to ${newStatusCode}`);
+    }
+    
+    // Get project and current status
+    const project = await ProjectModel.findById(projectId);
+    const oldStatusCode = project.status.current.code;
+    const now = new Date();
+    
+    // Update status history with end time for current status
+    if (project.status.history.length > 0) {
+      const currentStatusRecord = project.status.history[project.status.history.length - 1];
+      if (currentStatusRecord.code === oldStatusCode && !currentStatusRecord.to) {
+        currentStatusRecord.to = now;
+        currentStatusRecord.duration = now - currentStatusRecord.from;
+      }
+    }
+    
+    // Add new status to history
+    project.status.history.push({
+      code: newStatusCode,
+      from: now,
+      to: null,
+      duration: 0,
+      setBy: userId,
+      notes
+    });
+    
+    // Update current status
+    project.status.current = {
+      code: newStatusCode,
+      since: now,
+      setBy: userId,
+      notes
+    };
+    
+    // Clear subStatus if moving to a new main status
+    if (project.status.subStatus?.code) {
+      project.status.subStatus = {
+        code: 'NONE',
+        since: now,
+        reason: ''
+      };
+    }
+    
+    // Update actual timeline dates
+    if (!project.status.timeline.actual[newStatusCode]) {
+      project.status.timeline.actual[newStatusCode] = now;
+    }
+    
+    // Create a status change record for auditing
+    const statusChange = new StatusChangeModel({
+      projectId,
+      fromStatus: oldStatusCode,
+      toStatus: newStatusCode,
+      fromSubStatus: project.status.subStatus?.code || 'NONE',
+      toSubStatus: 'NONE',
+      changedBy: userId,
+      timestamp: now,
+      notes,
+      visibleToClient: true // Configurable
+    });
+    
+    // Save everything
+    await statusChange.save();
+    await project.save();
+    
+    // Notify interested parties
+    await Promise.all([
+      this.notificationService.sendStatusChangeNotifications(project, oldStatusCode, newStatusCode, notes),
+      this.webhookService.notifyExternalSystems(project, statusChange),
+      this.n8nService.triggerStatusChangeWorkflow(project, statusChange)
+    ]);
+    
+    return {
+      project,
+      statusChange
+    };
+  }
+  
+  async setSubStatus(projectId, subStatusCode, reason = '', userId) {
+    const project = await ProjectModel.findById(projectId);
+    if (!project) throw new Error('Project not found');
+    
+    const oldSubStatus = project.status.subStatus?.code || 'NONE';
+    const now = new Date();
+    
+    project.status.subStatus = {
+      code: subStatusCode,
+      since: now,
+      reason
+    };
+    
+    const statusChange = new StatusChangeModel({
+      projectId,
+      fromStatus: project.status.current.code,
+      toStatus: project.status.current.code,
+      fromSubStatus: oldSubStatus,
+      toSubStatus: subStatusCode,
+      changedBy: userId,
+      timestamp: now,
+      notes: reason,
+      visibleToClient: true
+    });
+    
+    await statusChange.save();
+    await project.save();
+    
+    // Notify if changing to CLARIFICATION_NEEDED
+    if (subStatusCode === 'CLARIFICATION_NEEDED') {
+      await this.notificationService.sendClarificationRequest(project, reason);
+    }
+    
+    return {
+      project,
+      statusChange
+    };
+  }
+  
+  async requestClarification(projectId, questions, userId) {
+    const project = await ProjectModel.findById(projectId);
+    if (!project) throw new Error('Project not found');
+    
+    // Add to clarifications list
+    const clarification = {
+      id: new ObjectId(),
+      question: questions,
+      requestedBy: userId,
+      requestedAt: new Date(),
+      response: '',
+      respondedAt: null,
+      resolved: false
+    };
+    
+    project.status.clarifications.push(clarification);
+    
+    // Set sub-status to clarification needed
+    return this.setSubStatus(
+      projectId, 
+      'CLARIFICATION_NEEDED', 
+      `Clarification requested: ${questions.substring(0, 100)}${questions.length > 100 ? '...' : ''}`,
+      userId
+    );
+  }
+  
+  async respondToClarification(projectId, clarificationId, response, userId) {
+    const project = await ProjectModel.findById(projectId);
+    if
