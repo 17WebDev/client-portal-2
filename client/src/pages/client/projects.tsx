@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
@@ -50,7 +50,7 @@ export default function ClientProjects() {
   const isLoading = isClientLoading || isProjectsLoading;
 
   // Set the selected project to the first one if none is selected
-  React.useEffect(() => {
+  useEffect(() => {
     if (projects && projects.length > 0 && !selectedProjectId) {
       setSelectedProjectId(projects[0].id);
     }
