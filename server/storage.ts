@@ -8,14 +8,19 @@ import {
 } from "@shared/schema";
 import createMemoryStore from "memorystore";
 import session from "express-session";
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
+import connectPg from "connect-pg-simple";
+import { pool } from "./db";
 
+const PostgresSessionStore = connectPg(session);
 const MemoryStore = createMemoryStore(session);
 
 // INTERFACE
 
 export interface IStorage {
   // Session
-  sessionStore: session.SessionStore;
+  sessionStore: session.Store;
   
   // Users
   getUser(id: number): Promise<User | undefined>;
@@ -360,4 +365,244 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  sessionStore: session.SessionStore;
+
+  constructor() {
+    this.sessionStore = new PostgresSessionStore({ 
+      pool, 
+      createTableIfMissing: true 
+    });
+  }
+
+  // Users
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+  
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+  
+  async updateUser(id: number, userData: Partial<User>): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set(userData)
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser;
+  }
+  
+  async getAllUsers(): Promise<User[]> {
+    return db.select().from(users);
+  }
+  
+  // Clients
+  async getClient(id: number): Promise<Client | undefined> {
+    const [client] = await db.select().from(clients).where(eq(clients.id, id));
+    return client;
+  }
+  
+  async getClientByUserId(userId: number): Promise<Client | undefined> {
+    const [client] = await db.select().from(clients).where(eq(clients.userId, userId));
+    return client;
+  }
+  
+  async createClient(insertClient: InsertClient): Promise<Client> {
+    const [client] = await db.insert(clients).values(insertClient).returning();
+    return client;
+  }
+  
+  async updateClient(id: number, clientData: Partial<Client>): Promise<Client | undefined> {
+    const now = new Date();
+    const [updatedClient] = await db
+      .update(clients)
+      .set({ ...clientData, updatedAt: now })
+      .where(eq(clients.id, id))
+      .returning();
+    return updatedClient;
+  }
+  
+  async getAllClients(): Promise<Client[]> {
+    return db.select().from(clients);
+  }
+  
+  async getClientsByPipelineStage(stage: string): Promise<Client[]> {
+    return db.select().from(clients).where(eq(clients.pipelineStage, stage));
+  }
+  
+  // Projects
+  async getProject(id: number): Promise<Project | undefined> {
+    const [project] = await db.select().from(projects).where(eq(projects.id, id));
+    return project;
+  }
+  
+  async getProjectsByClientId(clientId: number): Promise<Project[]> {
+    return db.select().from(projects).where(eq(projects.clientId, clientId));
+  }
+  
+  async createProject(insertProject: InsertProject): Promise<Project> {
+    const [project] = await db.insert(projects).values(insertProject).returning();
+    return project;
+  }
+  
+  async updateProject(id: number, projectData: Partial<Project>): Promise<Project | undefined> {
+    const now = new Date();
+    const [updatedProject] = await db
+      .update(projects)
+      .set({ ...projectData, updatedAt: now })
+      .where(eq(projects.id, id))
+      .returning();
+    return updatedProject;
+  }
+  
+  async getAllProjects(): Promise<Project[]> {
+    return db.select().from(projects);
+  }
+  
+  // Communications
+  async getCommunication(id: number): Promise<Communication | undefined> {
+    const [communication] = await db.select().from(communications).where(eq(communications.id, id));
+    return communication;
+  }
+  
+  async getCommunicationsByProjectId(projectId: number): Promise<Communication[]> {
+    return db.select().from(communications).where(eq(communications.projectId, projectId));
+  }
+  
+  async getCommunicationsByUserId(userId: number): Promise<Communication[]> {
+    return db.select().from(communications).where(
+      eq(communications.senderId, userId) || eq(communications.recipientId, userId)
+    );
+  }
+  
+  async createCommunication(insertCommunication: InsertCommunication): Promise<Communication> {
+    const [communication] = await db.insert(communications).values(insertCommunication).returning();
+    return communication;
+  }
+  
+  async markCommunicationAsRead(id: number): Promise<Communication | undefined> {
+    const now = new Date();
+    const [updatedCommunication] = await db
+      .update(communications)
+      .set({ readAt: now })
+      .where(eq(communications.id, id))
+      .returning();
+    return updatedCommunication;
+  }
+  
+  // Documents
+  async getDocument(id: number): Promise<Document | undefined> {
+    const [document] = await db.select().from(documents).where(eq(documents.id, id));
+    return document;
+  }
+  
+  async getDocumentsByProjectId(projectId: number): Promise<Document[]> {
+    return db.select().from(documents).where(eq(documents.projectId, projectId));
+  }
+  
+  async getDocumentsByClientId(clientId: number): Promise<Document[]> {
+    return db.select().from(documents).where(eq(documents.clientId, clientId));
+  }
+  
+  async getDocumentsByType(type: string): Promise<Document[]> {
+    return db.select().from(documents).where(eq(documents.type, type));
+  }
+  
+  async createDocument(insertDocument: InsertDocument): Promise<Document> {
+    const [document] = await db.insert(documents).values(insertDocument).returning();
+    return document;
+  }
+  
+  async updateDocument(id: number, documentData: Partial<Document>): Promise<Document | undefined> {
+    const now = new Date();
+    const [updatedDocument] = await db
+      .update(documents)
+      .set({ ...documentData, updatedAt: now })
+      .where(eq(documents.id, id))
+      .returning();
+    return updatedDocument;
+  }
+  
+  // Onboarding
+  async getOnboardingData(id: number): Promise<OnboardingData | undefined> {
+    const [data] = await db.select().from(onboardingData).where(eq(onboardingData.id, id));
+    return data;
+  }
+  
+  async getOnboardingDataByClientIdAndPhase(clientId: number, phase: string): Promise<OnboardingData | undefined> {
+    const [data] = await db.select()
+      .from(onboardingData)
+      .where(
+        and(
+          eq(onboardingData.clientId, clientId),
+          eq(onboardingData.phase, phase)
+        )
+      );
+    return data;
+  }
+  
+  async getAllOnboardingDataForClient(clientId: number): Promise<OnboardingData[]> {
+    return db.select()
+      .from(onboardingData)
+      .where(eq(onboardingData.clientId, clientId));
+  }
+  
+  async createOrUpdateOnboardingData(insertData: InsertOnboardingData): Promise<OnboardingData> {
+    // Check if data already exists for this client and phase
+    const existingData = await this.getOnboardingDataByClientIdAndPhase(
+      insertData.clientId,
+      insertData.phase
+    );
+    
+    if (existingData) {
+      const now = new Date();
+      const [updatedData] = await db
+        .update(onboardingData)
+        .set({ 
+          data: insertData.data,
+          updatedAt: now 
+        })
+        .where(eq(onboardingData.id, existingData.id))
+        .returning();
+      return updatedData;
+    } else {
+      const [newData] = await db
+        .insert(onboardingData)
+        .values({
+          ...insertData,
+          completedAt: null,
+        })
+        .returning();
+      return newData;
+    }
+  }
+  
+  async completeOnboardingPhase(id: number): Promise<OnboardingData | undefined> {
+    const now = new Date();
+    const [updatedData] = await db
+      .update(onboardingData)
+      .set({ 
+        completedAt: now,
+        updatedAt: now 
+      })
+      .where(eq(onboardingData.id, id))
+      .returning();
+    return updatedData;
+  }
+}
+
+// Switch to database storage
+export const storage = new DatabaseStorage();
