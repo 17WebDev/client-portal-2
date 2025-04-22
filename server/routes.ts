@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
+import { db } from "./db";
 import { 
   insertClientSchema, 
   insertProjectSchema, 
@@ -10,7 +11,8 @@ import {
   insertOnboardingDataSchema,
   insertProjectStatusHistorySchema,
   insertProjectClarificationSchema,
-  insertProjectStatusDataSchema
+  insertProjectStatusDataSchema,
+  projectClarifications
 } from "@shared/schema";
 import { 
   projectStatusService, 
@@ -19,6 +21,7 @@ import {
   n8nService 
 } from "./services";
 import { z } from "zod";
+import { eq } from "drizzle-orm";
 
 // Middleware to check if user is authenticated
 const isAuthenticated = (req: any, res: any, next: any) => {
@@ -39,6 +42,284 @@ const isAdmin = (req: any, res: any, next: any) => {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
   setupAuth(app);
+  
+  // PROJECT STATUS ROUTES
+  
+  // Get project status data
+  app.get("/api/projects/:id/status", isAuthenticated, async (req, res) => {
+    try {
+      const projectId = parseInt(req.params.id);
+      const project = await storage.getProject(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Check permissions
+      if (req.user?.role !== "admin") {
+        // For clients, check if the project belongs to them
+        const client = await storage.getClientByUserId(req.user?.id || 0);
+        if (!client || client.id !== project.clientId) {
+          return res.status(403).json({ message: "You don't have permission to access this project" });
+        }
+      }
+      
+      try {
+        const statusData = await projectStatusService.getProjectStatusData(projectId);
+        res.json(statusData);
+      } catch (error) {
+        // If status data doesn't exist yet, initialize it for this project
+        if (error instanceof Error && error.message.includes("not found")) {
+          await projectStatusService.initializeProjectStatus(projectId, "SCOPING", req.user?.id || 1);
+          const statusData = await projectStatusService.getProjectStatusData(projectId);
+          res.json(statusData);
+        } else {
+          throw error;
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching project status:", error);
+      res.status(500).json({ message: "Failed to fetch project status" });
+    }
+  });
+  
+  // Get project status history
+  app.get("/api/projects/:id/status/history", isAuthenticated, async (req, res) => {
+    try {
+      const projectId = parseInt(req.params.id);
+      const project = await storage.getProject(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Check permissions
+      if (req.user?.role !== "admin") {
+        // For clients, check if the project belongs to them
+        const client = await storage.getClientByUserId(req.user?.id || 0);
+        if (!client || client.id !== project.clientId) {
+          return res.status(403).json({ message: "You don't have permission to access this project" });
+        }
+      }
+      
+      const history = await projectStatusService.getProjectStatusHistory(projectId);
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching project status history:", error);
+      res.status(500).json({ message: "Failed to fetch project status history" });
+    }
+  });
+  
+  // Update project status (admin only)
+  app.post("/api/projects/:id/status", isAdmin, async (req, res) => {
+    try {
+      const projectId = parseInt(req.params.id);
+      const { statusCode, notes } = req.body;
+      
+      if (!statusCode) {
+        return res.status(400).json({ message: "Status code is required" });
+      }
+      
+      const project = await storage.getProject(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      const result = await projectStatusService.updateProjectStatus(
+        projectId,
+        statusCode,
+        req.user?.id || 1,
+        notes
+      );
+      
+      res.json(result);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("Invalid status transition")) {
+        return res.status(400).json({ message: error.message });
+      }
+      console.error("Error updating project status:", error);
+      res.status(500).json({ message: "Failed to update project status" });
+    }
+  });
+  
+  // Set project sub-status (admin only)
+  app.post("/api/projects/:id/substatus", isAdmin, async (req, res) => {
+    try {
+      const projectId = parseInt(req.params.id);
+      const { subStatus, reason } = req.body;
+      
+      if (!subStatus) {
+        return res.status(400).json({ message: "Sub-status is required" });
+      }
+      
+      const project = await storage.getProject(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      const result = await projectStatusService.setProjectSubStatus(
+        projectId,
+        subStatus,
+        req.user?.id || 1,
+        reason
+      );
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error setting project sub-status:", error);
+      res.status(500).json({ message: "Failed to set project sub-status" });
+    }
+  });
+  
+  // Request clarification for a project (admin only)
+  app.post("/api/projects/:id/clarification/request", isAdmin, async (req, res) => {
+    try {
+      const projectId = parseInt(req.params.id);
+      const { question } = req.body;
+      
+      if (!question) {
+        return res.status(400).json({ message: "Question is required" });
+      }
+      
+      const project = await storage.getProject(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      const result = await projectStatusService.requestClarification(
+        projectId,
+        question,
+        req.user?.id || 1
+      );
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error requesting clarification:", error);
+      res.status(500).json({ message: "Failed to request clarification" });
+    }
+  });
+  
+  // Respond to a clarification request (client can respond)
+  app.post("/api/projects/clarification/:id/respond", isAuthenticated, async (req, res) => {
+    try {
+      const clarificationId = parseInt(req.params.id);
+      const { response } = req.body;
+      
+      if (!response) {
+        return res.status(400).json({ message: "Response is required" });
+      }
+      
+      // Get the clarification to check permissions
+      const clarifications = await db
+        .select()
+        .from(projectClarifications)
+        .where(eq(projectClarifications.id, clarificationId));
+      
+      if (clarifications.length === 0) {
+        return res.status(404).json({ message: "Clarification request not found" });
+      }
+      
+      const clarification = clarifications[0];
+      const project = await storage.getProject(clarification.projectId);
+      
+      // Check permissions
+      if (req.user?.role !== "admin") {
+        // For clients, check if the project belongs to them
+        const client = await storage.getClientByUserId(req.user?.id || 0);
+        if (!client || client.id !== project.clientId) {
+          return res.status(403).json({ message: "You don't have permission to respond to this clarification" });
+        }
+      }
+      
+      const result = await projectStatusService.respondToClarification(
+        clarificationId,
+        response,
+        req.user?.id || 1
+      );
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error responding to clarification:", error);
+      res.status(500).json({ message: "Failed to respond to clarification" });
+    }
+  });
+  
+  // Get project clarifications
+  app.get("/api/projects/:id/clarifications", isAuthenticated, async (req, res) => {
+    try {
+      const projectId = parseInt(req.params.id);
+      const project = await storage.getProject(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Check permissions
+      if (req.user?.role !== "admin") {
+        // For clients, check if the project belongs to them
+        const client = await storage.getClientByUserId(req.user?.id || 0);
+        if (!client || client.id !== project.clientId) {
+          return res.status(403).json({ message: "You don't have permission to access this project" });
+        }
+      }
+      
+      const clarifications = await projectStatusService.getProjectClarifications(projectId);
+      
+      // Enhance with user information
+      const enhancedClarifications = await Promise.all(
+        clarifications.map(async (clarification) => {
+          const requestedBy = await storage.getUser(clarification.requestedById);
+          let respondedBy = null;
+          if (clarification.respondedById) {
+            respondedBy = await storage.getUser(clarification.respondedById);
+          }
+          
+          return {
+            ...clarification,
+            requestedBy: requestedBy ? { id: requestedBy.id, name: requestedBy.name } : null,
+            respondedBy: respondedBy ? { id: respondedBy.id, name: respondedBy.name } : null
+          };
+        })
+      );
+      
+      res.json(enhancedClarifications);
+    } catch (error) {
+      console.error("Error fetching clarifications:", error);
+      res.status(500).json({ message: "Failed to fetch clarifications" });
+    }
+  });
+  
+  // Update project health (admin only)
+  app.post("/api/projects/:id/health", isAdmin, async (req, res) => {
+    try {
+      const projectId = parseInt(req.params.id);
+      const { healthStatus, healthFactors } = req.body;
+      
+      if (!healthStatus || !healthFactors) {
+        return res.status(400).json({ message: "Health status and factors are required" });
+      }
+      
+      const project = await storage.getProject(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      const result = await projectStatusService.updateProjectHealth(
+        projectId,
+        healthStatus,
+        healthFactors,
+        req.user?.id || 1
+      );
+      
+      res.json(result);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("Invalid health status")) {
+        return res.status(400).json({ message: error.message });
+      }
+      console.error("Error updating project health:", error);
+      res.status(500).json({ message: "Failed to update project health" });
+    }
+  });
 
   // CLIENTS ROUTES
   
