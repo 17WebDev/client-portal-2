@@ -78,7 +78,7 @@ export class MemStorage implements IStorage {
   private documents: Map<number, Document>;
   private onboardingData: Map<number, OnboardingData>;
   
-  sessionStore: session.SessionStore;
+  sessionStore: session.Store;
   currentId: number;
 
   constructor() {
@@ -115,11 +115,14 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentId++;
     const now = new Date();
+    // Handle required fields to satisfy User type
     const user: User = { 
       ...insertUser, 
       id,
       createdAt: now,
-      lastLogin: null 
+      lastLogin: null,
+      phone: insertUser.phone || null,
+      role: insertUser.role || 'client'
     };
     this.users.set(id, user);
     return user;
@@ -156,7 +159,14 @@ export class MemStorage implements IStorage {
       ...insertClient,
       id,
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
+      legalEntityName: insertClient.legalEntityName || null,
+      legalBusinessAddress: insertClient.legalBusinessAddress || null,
+      signeeName: insertClient.signeeName || null,
+      signeeEmail: insertClient.signeeEmail || null,
+      signeePhone: insertClient.signeePhone || null,
+      onboardingStatus: insertClient.onboardingStatus || 'pending',
+      pipelineStage: insertClient.pipelineStage || 'qualifying_call'
     };
     this.clients.set(id, client);
     return client;
@@ -366,7 +376,7 @@ export class MemStorage implements IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  sessionStore: session.SessionStore;
+  sessionStore: session.Store;
 
   constructor() {
     this.sessionStore = new PostgresSessionStore({ 
