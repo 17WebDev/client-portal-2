@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { Loader2, Grid, List, Filter, SortDesc, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
@@ -57,10 +58,6 @@ export default function ProjectsPage() {
 
   // Fetch client projects
   const clientId = user?.id; // Use the user's id to get their client information
-  const { data: client } = useQuery({
-    queryKey: ["/api/clients", clientId],
-    enabled: !!clientId,
-  });
   
   // Define Project type based on what we expect to receive
   type Project = {
@@ -76,6 +73,19 @@ export default function ProjectsPage() {
     // Add other fields as needed
   };
 
+  // Define client type
+  type Client = {
+    id: number;
+    userId: number;
+    companyName: string;
+    // Other client fields
+  };
+
+  const { data: client = null as Client | null } = useQuery<Client>({
+    queryKey: ["/api/clients", clientId],
+    enabled: !!clientId,
+  });
+  
   const { data: projects = [] as Project[], isLoading } = useQuery<Project[]>({
     queryKey: ["/api/clients", client?.id, "projects"],
     enabled: !!client?.id,
@@ -334,7 +344,9 @@ export default function ProjectsPage() {
                   <Badge variant="outline" className="text-green-500 border-green-500">
                     Delivered
                   </Badge>
-                  <Button variant="outline" size="sm">View Details</Button>
+                  <Link href="/projects/3">
+                    <Button variant="outline" size="sm">View Details</Button>
+                  </Link>
                 </CardFooter>
               </div>
             </Card>
