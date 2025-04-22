@@ -56,10 +56,29 @@ export default function ProjectsPage() {
   const [sortBy, setSortBy] = useState<SortOption>("recent");
 
   // Fetch client projects
-  const clientId = user?.clientId;
-  const { data: projects, isLoading } = useQuery({
-    queryKey: ["/api/clients", clientId, "projects"],
+  const clientId = user?.id; // Use the user's id to get their client information
+  const { data: client } = useQuery({
+    queryKey: ["/api/clients", clientId],
     enabled: !!clientId,
+  });
+  
+  // Define Project type based on what we expect to receive
+  type Project = {
+    id: number;
+    name: string;
+    description: string;
+    status: string;
+    progressPercentage: number;
+    startDate?: Date;
+    estimatedCompletionDate?: Date;
+    actualCompletionDate?: Date;
+    requiresAttention?: boolean;
+    // Add other fields as needed
+  };
+
+  const { data: projects = [] as Project[], isLoading } = useQuery<Project[]>({
+    queryKey: ["/api/clients", client?.id, "projects"],
+    enabled: !!client?.id,
   });
 
   // Handle search input
@@ -239,7 +258,9 @@ export default function ProjectsPage() {
                   <Badge variant="outline" className="text-amber-500 border-amber-500">
                     Needs Review
                   </Badge>
-                  <Button variant="outline" size="sm">View Details</Button>
+                  <Link href="/projects/1">
+                    <Button variant="outline" size="sm">View Details</Button>
+                  </Link>
                 </CardFooter>
               </div>
             </Card>
@@ -275,7 +296,9 @@ export default function ProjectsPage() {
                   <Badge variant="outline" className="text-blue-500 border-blue-500">
                     Awaiting Approval
                   </Badge>
-                  <Button variant="outline" size="sm">View Details</Button>
+                  <Link href="/projects/2">
+                    <Button variant="outline" size="sm">View Details</Button>
+                  </Link>
                 </CardFooter>
               </div>
             </Card>

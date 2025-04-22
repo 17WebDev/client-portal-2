@@ -19,6 +19,8 @@ import ClientOverview from "@/pages/client/overview";
 import ClientProjects from "@/pages/client/projects";
 import ClientDocuments from "@/pages/client/documents";
 import ClientMessages from "@/pages/client/messages";
+import ProjectsPage from "@/pages/client/projects-page";
+import ProjectDetailPage from "@/pages/client/project-detail-page";
 
 // Shared Pages
 import Settings from "@/pages/settings";
@@ -40,6 +42,10 @@ function Router() {
       <ProtectedRoute path="/client/projects" component={ClientProjects} />
       <ProtectedRoute path="/client/documents" component={ClientDocuments} />
       <ProtectedRoute path="/client/messages" component={ClientMessages} />
+      
+      {/* New Projects Routes */}
+      <ProtectedRoute path="/projects" component={ProjectsPage} />
+      <ProtectedRoute path="/projects/:id" component={ProjectDetailPage} />
       
       {/* Shared Routes */}
       <ProtectedRoute path="/settings" component={Settings} />

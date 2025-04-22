@@ -69,8 +69,72 @@ export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState("overview");
   
+  // Define Project type
+  type ProjectTeamMember = {
+    id: string;
+    name: string;
+    role: string;
+  };
+  
+  type Project = {
+    id: string;
+    name: string;
+    description: string;
+    startDate: Date;
+    estimatedCompletionDate: Date;
+    actualCompletionDate?: Date | null;
+    client: {
+      id: string;
+      name: string;
+      primaryContact: string;
+    };
+    team: {
+      projectManager: {
+        id: string;
+        name: string;
+        email: string;
+      };
+      members: ProjectTeamMember[];
+    };
+    tags: string[];
+    priority: string;
+    currentStatus: {
+      code: string;
+      label: string;
+      since: Date;
+      notes: string;
+    };
+    subStatus: {
+      code: string;
+      label: string;
+      reason: string;
+    };
+    progressPercentage: number;
+    healthMetrics: {
+      overallHealth: string;
+      factors: {
+        [key: string]: { status: string; details: string };
+      }
+    };
+    requiredActions?: {
+      id: string;
+      title: string;
+      description: string;
+      type: string;
+      priority: string;
+      dueDate: Date;
+      status: string;
+    }[];
+    statusJourney: {
+      status: string;
+      startDate: Date | null;
+      endDate: Date | null;
+      completed: boolean;
+    }[];
+  };
+
   // Fetch project details
-  const { data: project, isLoading } = useQuery({
+  const { data: project, isLoading } = useQuery<Project>({
     queryKey: ["/api/projects", id],
     enabled: !!id,
   });
@@ -304,8 +368,8 @@ export default function ProjectDetailPage() {
                         <span className="font-medium">{phase.status}</span>
                         {phase.startDate && (
                           <span className="text-xs text-muted-foreground">
-                            {phase.completed
-                              ? `${new Date(phase.startDate).toLocaleDateString()} - ${new Date(phase.endDate).toLocaleDateString()}`
+                            {phase.completed && phase.endDate
+                              ? `${new Date(phase.startDate).toLocaleDateString()} - ${phase.endDate ? new Date(phase.endDate).toLocaleDateString() : 'Present'}`
                               : `Started: ${new Date(phase.startDate).toLocaleDateString()}`}
                           </span>
                         )}
