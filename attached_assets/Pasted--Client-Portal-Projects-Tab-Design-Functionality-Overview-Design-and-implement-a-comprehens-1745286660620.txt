@@ -1,0 +1,599 @@
+# Client Portal "Projects" Tab Design & Functionality
+
+## Overview
+Design and implement a comprehensive "Projects" tab for the client portal that provides clients with a clear overview of all their projects, detailed status information, and intuitive navigation to project-specific details. This tab serves as the central hub for clients to monitor progress and access all project-related information.
+
+## Core Requirements
+
+### Projects Dashboard (Main View)
+
+1. **Project Cards Grid/List**
+   - Implement a toggle between grid and list views
+   - Each project card should prominently display:
+     - Project name and logo/icon
+     - Current status with color-coded indicator
+     - Progress bar showing completion percentage
+     - Timeline information (start date, estimated completion)
+     - Priority indicator (if applicable)
+     - Alert indicators for required actions or issues
+
+2. **Project Filtering & Sorting**
+   - Filter options:
+     - By status (dropdown with all possible statuses)
+     - By date range (start/end dates)
+     - By priority
+   - Sorting options:
+     - Most recent
+     - Alphabetical
+     - Status (in progress first)
+     - Deadline (closest first)
+
+3. **Quick Stats Overview**
+   - Total number of projects
+   - Projects by status (visual breakdown)
+   - Projects requiring attention
+   - Recently updated projects
+
+4. **Search Functionality**
+   - Global search bar for finding projects quickly
+   - Search by project name, ID, or keywords
+
+### Project Detail View
+
+When a client clicks on a project card, they should be taken to a detailed project view with the following sections:
+
+1. **Project Header**
+   - Project name and description
+   - Key dates (start, estimated completion, actual completion)
+   - Client and internal project owners/contacts
+   - Project tags/categories
+
+2. **Status Journey Map**
+   - Visual timeline of all project phases
+   - Current phase highlighted
+   - Completed phases with actual dates
+   - Upcoming phases with estimated dates
+   - Status transition history
+
+3. **Project Health Dashboard**
+   - Overall health indicator (Excellent, Good, At Risk, Critical)
+   - Key health factors:
+     - Timeline adherence
+     - Budget status
+     - Scope clarity
+     - Communication frequency
+
+4. **Required Actions Panel**
+   - Prominent section for items requiring client attention
+   - Clear action buttons for responding to requests
+   - Due dates for each action item
+   - Ability to mark actions as completed
+
+5. **Project Timeline**
+   - Gantt chart or timeline visualization
+   - Major milestones marked
+   - Current position indicator
+   - Ability to see past performance vs. estimates
+
+6. **Communication Center**
+   - Recent messages and updates
+   - Ability to post new messages or questions
+   - File attachment capabilities
+   - Tagged conversation topics
+
+7. **Document Repository**
+   - Categorized document sections:
+     - Contracts & Agreements
+     - Project Deliverables
+     - Invoices & Payments
+     - Meeting Notes & Reports
+   - Version history for documents
+   - Upload/download functionality
+   - Signature requests
+
+8. **Team Section**
+   - Key team members working on the project
+   - Roles and responsibilities
+   - Contact information
+   - Availability indicators
+
+## UI/UX Requirements
+
+### Visual Design
+- Clean, modern interface using shadCN components
+- Consistent color coding for status indicators
+- Clear typography hierarchy for information scanning
+- Responsive design that works on desktop and mobile devices
+- Subtle animations for state changes and transitions
+
+### User Experience
+- Intuitive navigation between projects list and detail views
+- Persistent breadcrumb navigation
+- Quick access to most important information above the fold
+- Progressive disclosure of detailed information
+- Contextual help tooltips for complex features
+
+### Accessibility
+- High contrast for status indicators
+- Screen reader compatibility
+- Keyboard navigation support
+- Text alternatives for all visual indicators
+
+## Interactive Features
+
+1. **Real-time Updates**
+   - Live status updates without page refresh
+   - Notification indicators for new information
+   - "Last updated" timestamps
+
+2. **Interactive Timeline**
+   - Ability to click on timeline phases for details
+   - Expandable milestones with associated deliverables
+   - Comparison view of planned vs. actual timelines
+
+3. **Feedback Collection**
+   - In-context feedback requests at key project stages
+   - Rating system for deliverables
+   - Comment functionality on specific items
+
+4. **Custom Views & Favorites**
+   - Allow clients to save custom filtered views
+   - Star/favorite important projects for quick access
+   - Personalized dashboard configuration
+
+## Data Requirements
+
+Each project in the Projects tab should display and manage the following data:
+
+### Basic Project Information
+```javascript
+{
+  id: String,
+  name: String,
+  description: String,
+  startDate: Date,
+  estimatedCompletionDate: Date,
+  actualCompletionDate: Date,
+  client: {
+    id: String,
+    name: String,
+    primaryContact: String
+  },
+  team: {
+    projectManager: {
+      id: String,
+      name: String,
+      email: String
+    },
+    members: [
+      {
+        id: String,
+        name: String,
+        role: String
+      }
+    ]
+  },
+  tags: [String],
+  priority: String, // 'Low', 'Medium', 'High', 'Urgent'
+}
+```
+
+### Status Information
+```javascript
+{
+  currentStatus: {
+    code: String,
+    label: String,
+    since: Date,
+    notes: String
+  },
+  subStatus: {
+    code: String,
+    label: String,
+    reason: String
+  },
+  progressPercentage: Number,
+  statusHistory: [
+    {
+      status: String,
+      enteredAt: Date,
+      exitedAt: Date,
+      duration: String, // Formatted duration
+      notes: String
+    }
+  ],
+  timeline: {
+    phases: [
+      {
+        name: String,
+        plannedStartDate: Date,
+        plannedEndDate: Date,
+        actualStartDate: Date,
+        actualEndDate: Date,
+        status: String, // 'Not Started', 'In Progress', 'Completed', 'Delayed'
+        milestones: [
+          {
+            name: String,
+            dueDate: Date,
+            completedDate: Date,
+            deliverables: [String]
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Health Metrics
+```javascript
+{
+  overallHealth: String, // 'Excellent', 'Good', 'At Risk', 'Critical'
+  factors: {
+    timeline: {
+      status: String,
+      details: String
+    },
+    budget: {
+      status: String,
+      details: String
+    },
+    scopeClarity: {
+      status: String,
+      details: String
+    },
+    communication: {
+      status: String,
+      details: String
+    }
+  },
+  lastAssessment: Date
+}
+```
+
+### Required Actions
+```javascript
+{
+  actions: [
+    {
+      id: String,
+      title: String,
+      description: String,
+      type: String, // 'Decision', 'Information', 'Approval', 'Review'
+      priority: String, // 'Low', 'Medium', 'High', 'Urgent'
+      dueDate: Date,
+      status: String, // 'Pending', 'Completed', 'Overdue'
+      createdAt: Date,
+      completedAt: Date
+    }
+  ]
+}
+```
+
+## Implementation Approach
+
+### Frontend Components
+
+1. **ProjectsList Component**
+```jsx
+const ProjectsList = ({ projects, viewType, filters, sorting }) => {
+  // Implement filtering and sorting logic
+  const filteredProjects = applyFilters(projects, filters);
+  const sortedProjects = applySorting(filteredProjects, sorting);
+  
+  return (
+    <div className="projects-container">
+      <div className="view-controls">
+        <ViewToggle 
+          currentView={viewType} 
+          onChange={handleViewChange} 
+        />
+        <FilterControls 
+          filters={filters} 
+          onFilterChange={handleFilterChange} 
+        />
+        <SortControls 
+          sorting={sorting} 
+          onSortChange={handleSortChange} 
+        />
+      </div>
+      
+      {viewType === 'grid' ? (
+        <div className="projects-grid">
+          {sortedProjects.map(project => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
+      ) : (
+        <div className="projects-list">
+          {sortedProjects.map(project => (
+            <ProjectListItem key={project.id} project={project} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+2. **ProjectCard Component**
+```jsx
+const ProjectCard = ({ project }) => {
+  const statusColor = getStatusColor(project.currentStatus.code);
+  const hasActions = project.actions?.some(a => a.status === 'Pending');
+  
+  return (
+    <div className="project-card">
+      <div className="card-header">
+        <h3>{project.name}</h3>
+        <div 
+          className={`status-badge ${project.currentStatus.code.toLowerCase()}`}
+          style={{ backgroundColor: statusColor }}
+        >
+          {project.currentStatus.label}
+        </div>
+      </div>
+      
+      <div className="progress-bar">
+        <div 
+          className="progress-fill" 
+          style={{ width: `${project.progressPercentage}%` }}
+        ></div>
+      </div>
+      
+      <div className="card-details">
+        <div className="date-info">
+          <span className="label">Started:</span>
+          <span className="value">{formatDate(project.startDate)}</span>
+        </div>
+        <div className="date-info">
+          <span className="label">Est. Completion:</span>
+          <span className="value">{formatDate(project.estimatedCompletionDate)}</span>
+        </div>
+      </div>
+      
+      <div className="card-footer">
+        {hasActions && (
+          <div className="action-badge">
+            <AlertIcon size={16} />
+            <span>Action Required</span>
+          </div>
+        )}
+        
+        <Link to={`/projects/${project.id}`} className="view-details">
+          View Details
+        </Link>
+      </div>
+    </div>
+  );
+};
+```
+
+3. **ProjectDetail Component**
+```jsx
+const ProjectDetail = ({ projectId }) => {
+  const [project, setProject] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('overview');
+  
+  useEffect(() => {
+    // Fetch project details
+    const fetchProject = async () => {
+      try {
+        const response = await api.getProject(projectId);
+        setProject(response.data);
+      } catch (error) {
+        console.error('Error fetching project:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProject();
+  }, [projectId]);
+  
+  if (loading) return <LoadingSpinner />;
+  if (!project) return <NotFound message="Project not found" />;
+  
+  return (
+    <div className="project-detail">
+      <Breadcrumbs 
+        items={[
+          { label: 'Projects', link: '/projects' },
+          { label: project.name, link: `/projects/${project.id}` }
+        ]} 
+      />
+      
+      <div className="project-header">
+        <h1>{project.name}</h1>
+        <div className="project-meta">
+          <StatusBadge status={project.currentStatus} />
+          <HealthIndicator health={project.overallHealth} />
+        </div>
+      </div>
+      
+      <div className="project-tabs">
+        <TabButton 
+          active={activeTab === 'overview'} 
+          onClick={() => setActiveTab('overview')}
+        >
+          Overview
+        </TabButton>
+        <TabButton 
+          active={activeTab === 'timeline'} 
+          onClick={() => setActiveTab('timeline')}
+        >
+          Timeline
+        </TabButton>
+        <TabButton 
+          active={activeTab === 'communication'} 
+          onClick={() => setActiveTab('communication')}
+        >
+          Communication
+        </TabButton>
+        <TabButton 
+          active={activeTab === 'documents'} 
+          onClick={() => setActiveTab('documents')}
+        >
+          Documents
+        </TabButton>
+        <TabButton 
+          active={activeTab === 'team'} 
+          onClick={() => setActiveTab('team')}
+        >
+          Team
+        </TabButton>
+      </div>
+      
+      <div className="tab-content">
+        {activeTab === 'overview' && (
+          <ProjectOverview project={project} />
+        )}
+        {activeTab === 'timeline' && (
+          <ProjectTimeline project={project} />
+        )}
+        {activeTab === 'communication' && (
+          <ProjectCommunication project={project} />
+        )}
+        {activeTab === 'documents' && (
+          <ProjectDocuments project={project} />
+        )}
+        {activeTab === 'team' && (
+          <ProjectTeam project={project} />
+        )}
+      </div>
+    </div>
+  );
+};
+```
+
+### Backend API Endpoints
+
+1. **Project Listing Endpoints**
+```javascript
+// GET /api/projects
+// List all projects for the client
+router.get('/projects', authMiddleware, async (req, res) => {
+  try {
+    const clientId = req.user.clientId;
+    const projects = await ProjectModel.find({ clientId })
+      .select('name description startDate estimatedCompletionDate currentStatus progressPercentage actions')
+      .sort({ startDate: -1 });
+    
+    res.json(projects);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/projects/:id
+// Get detailed project information
+router.get('/projects/:id', authMiddleware, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const clientId = req.user.clientId;
+    
+    const project = await ProjectModel.findOne({ 
+      _id: projectId, 
+      clientId 
+    }).populate('team.members');
+    
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+    
+    res.json(project);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/projects/:id/timeline
+// Get project timeline details
+router.get('/projects/:id/timeline', authMiddleware, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    
+    const timeline = await TimelineModel.findOne({ projectId })
+      .populate('phases.milestones');
+    
+    if (!timeline) {
+      return res.status(404).json({ error: 'Timeline not found' });
+    }
+    
+    res.json(timeline);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/projects/:id/actions
+// Get required actions for a project
+router.get('/projects/:id/actions', authMiddleware, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    
+    const actions = await ActionModel.find({ 
+      projectId,
+      status: { $ne: 'Completed' }
+    }).sort({ dueDate: 1, priority: -1 });
+    
+    res.json(actions);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+```
+
+## Visual Style Guide
+
+### Color Scheme for Status Indicators
+- Scoping: #6941C6 (Purple)
+- Reviewing: #444CE7 (Blue)
+- Approved: #039855 (Green)
+- Setting Up: #6941C6 (Purple)
+- In Progress: #FF8800 (Orange)
+- On Hold: #BF4722 (Rust)
+- Ready for Review: #0086C9 (Light Blue)
+- Completed: #039855 (Green)
+
+### Typography
+- Headings: Inter, Semi-Bold
+- Body Text: Inter, Regular
+- Status Labels: Inter, Medium
+- Dates & Times: Inter, Regular, slightly muted
+
+### Layout
+- Card Design: Rounded corners (8px), subtle shadow
+- Grid Layout: 3 columns on desktop, 2 on tablet, 1 on mobile
+- Spacing: Consistent 16px/24px/32px spacing system
+- Progress Bars: 6px height, rounded ends
+
+## Recommendations for Implementation
+
+1. **Progressive Loading**
+   - Load project list data first, then fetch details on demand
+   - Implement skeleton loaders for improved perceived performance
+   - Cache previously viewed projects for quick navigation
+
+2. **Realtime Updates**
+   - Use WebSockets for status changes and new messages
+   - Implement optimistic UI updates for actions
+   - Show "new update" indicators without forcing refresh
+
+3. **Mobile Considerations**
+   - Simplify card design on mobile
+   - Use collapsible sections in the detail view
+   - Ensure touch targets are at least 44x44px
+
+4. **Empty States**
+   - Design helpful empty states for new clients with no projects
+   - Include guidance on what to expect
+   - Consider sample/demo projects for onboarding
+
+5. **Exportable Views**
+   - Allow PDF export of project status reports
+   - Enable calendar integration for key milestones
+   - Support email summaries of selected projects
+
+This implementation will provide clients with a comprehensive, user-friendly Projects tab that gives them clear visibility into their projects and facilitates effective communication with your team.
