@@ -736,7 +736,7 @@ export default function NewProjectPage() {
                   Back to Projects
                 </Button>
                 
-                <h1 className="text-2xl font-bold text-gray-900">Submit New Project</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Start a New Project</h1>
                 <p className="mt-1 text-gray-600">
                   Tell us about your project, and we'll help bring it to life.
                 </p>

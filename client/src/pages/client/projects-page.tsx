@@ -132,10 +132,10 @@ export default function ProjectsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
           <div className="flex gap-3">
             <Button className="bg-blue-600 hover:bg-blue-700">
-              <Link href="/projects/new">
+              <Link href="/client/projects/new">
                 <span className="flex items-center">
                   <Plus size={18} className="mr-2" />
-                  Submit New Project
+                  Start a Project
                 </span>
               </Link>
             </Button>
@@ -278,7 +278,7 @@ export default function ProjectsPage() {
                   <Badge variant="outline" className="text-amber-500 border-amber-500">
                     Needs Review
                   </Badge>
-                  <Link href="/projects/1">
+                  <Link href="/client/projects/1">
                     <Button variant="outline" size="sm">View Details</Button>
                   </Link>
                 </CardFooter>
@@ -316,7 +316,7 @@ export default function ProjectsPage() {
                   <Badge variant="outline" className="text-blue-500 border-blue-500">
                     Awaiting Approval
                   </Badge>
-                  <Link href="/projects/2">
+                  <Link href="/client/projects/2">
                     <Button variant="outline" size="sm">View Details</Button>
                   </Link>
                 </CardFooter>
@@ -354,7 +354,7 @@ export default function ProjectsPage() {
                   <Badge variant="outline" className="text-green-500 border-green-500">
                     Delivered
                   </Badge>
-                  <Link href="/projects/3">
+                  <Link href="/client/projects/3">
                     <Button variant="outline" size="sm">View Details</Button>
                   </Link>
                 </CardFooter>
