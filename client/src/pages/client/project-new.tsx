@@ -186,6 +186,113 @@ export default function NewProjectPage() {
 
   const renderStepContent = () => {
     switch (currentStep) {
+      case 5: // Confirmation step
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-xl font-semibold">Confirm Project Submission</h2>
+              <p className="text-gray-500">Please review your project details before submitting.</p>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="rounded-md border p-4">
+                <h3 className="text-lg font-medium mb-2">Basic Information</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium">Project Name:</span>
+                    <p className="mt-1">{form.getValues("name")}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium">Project Type:</span>
+                    <p className="mt-1">{form.getValues("projectType")}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="font-medium">Description:</span>
+                    <p className="mt-1">{form.getValues("description")}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="rounded-md border p-4">
+                <h3 className="text-lg font-medium mb-2">Existing Materials</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium">Existing Application:</span>
+                    <p className="mt-1">{form.getValues("existingApp") ? "Yes" : "No"}</p>
+                  </div>
+                  {form.getValues("existingApp") && (
+                    <div>
+                      <span className="font-medium">Application Type:</span>
+                      <p className="mt-1">{form.getValues("applicationType")}</p>
+                    </div>
+                  )}
+                  <div className="col-span-2">
+                    <span className="font-medium">Materials Links:</span>
+                    <p className="mt-1">{form.getValues("existingMaterialsLinks") || "None provided"}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="rounded-md border p-4">
+                <h3 className="text-lg font-medium mb-2">Goals & Timeline</h3>
+                <div className="grid grid-cols-1 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium">Ideal Completion Date:</span>
+                    <p className="mt-1">
+                      {(() => {
+                        const date = form.getValues("idealCompletionDate");
+                        return date ? format(date, "PPP") : "Not specified";
+                      })()}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="font-medium">Project Goal:</span>
+                    <p className="mt-1">{form.getValues("projectGoal")}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium">Expected Business Impact:</span>
+                    <p className="mt-1">{form.getValues("expectedBusinessImpact")}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium">Success Criteria:</span>
+                    <p className="mt-1">{form.getValues("successCriteria")}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="rounded-md border p-4">
+                <h3 className="text-lg font-medium mb-2">Budget Information</h3>
+                <div className="grid grid-cols-1 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium">Budget Range:</span>
+                    <p className="mt-1">{form.getValues("budgetRange") || "Not specified"}</p>
+                  </div>
+                  {form.getValues("budgetNotes") && (
+                    <div>
+                      <span className="font-medium">Budget Notes:</span>
+                      <p className="mt-1">{form.getValues("budgetNotes")}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="rounded-md bg-blue-50 border border-blue-200 p-4">
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-blue-500 mt-0.5 mr-2" />
+                  <div>
+                    <h3 className="text-sm font-medium text-blue-800">Ready to Submit</h3>
+                    <p className="text-sm text-blue-700 mt-1">
+                      Your project will be reviewed by our team once submitted. You can track its status
+                      in the Projects section.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+        
+      
       case 1:
         return (
           <div className="space-y-6">
@@ -684,7 +791,7 @@ export default function NewProjectPage() {
                             </>
                           ) : currentStep === totalSteps ? (
                             <>
-                              Submit Project
+                              Confirm & Submit
                               <CheckCircle className="ml-2 h-4 w-4" />
                             </>
                           ) : (
