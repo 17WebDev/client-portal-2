@@ -43,14 +43,17 @@ function Router() {
       <Route path="/client/overview">
         <Redirect to="/client/dashboard" />
       </Route>
-      <ProtectedRoute path="/client/projects" component={ClientProjects} />
+      <ProtectedRoute path="/client/projects/list" component={ClientProjects} />
       <ProtectedRoute path="/client/documents" component={ClientDocuments} />
       <ProtectedRoute path="/client/messages" component={ClientMessages} />
       
       {/* Projects Routes */}
       <ProtectedRoute path="/projects/new" component={NewProjectPage} />
+      <ProtectedRoute path="/client/projects/new" component={NewProjectPage} />
       <ProtectedRoute path="/projects/:id" component={ProjectDetailPage} />
+      <ProtectedRoute path="/client/projects/:id" component={ProjectDetailPage} />
       <ProtectedRoute path="/projects" component={ProjectsPage} />
+      <ProtectedRoute path="/client/projects" component={ProjectsPage} />
       
       {/* Shared Routes */}
       <ProtectedRoute path="/settings" component={Settings} />
