@@ -19,7 +19,8 @@ import {
   CalendarIcon,
   ClockIcon,
   FolderOpenIcon,
-  CheckCircle2Icon
+  CheckCircle2Icon,
+  PlusCircle
 } from "lucide-react";
 
 export default function ClientProjects() {
@@ -176,12 +177,10 @@ function NoProjectsState() {
             You don't have any active projects at the moment.
           </p>
           <div className="mt-6">
-            <Button>
-              <Link href="/client/projects/new">
-                <span className="flex items-center">
-                  Start a Project
-                </span>
-              </Link>
+            <Button onClick={() => window.location.href = "/client/projects/new"}>
+              <span className="flex items-center">
+                <PlusCircle className="mr-2 h-5 w-5" /> Start a Project
+              </span>
             </Button>
           </div>
         </CardContent>
