@@ -485,6 +485,27 @@ export default function NewProjectPage() {
                 </FormItem>
               )}
             />
+            
+            <FormField
+              control={form.control}
+              name="userNeeds"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>User Needs & Requirements</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Describe the needs of your users and any specific requirements they have."
+                      className="min-h-[120px]"
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Explain who will be using this project and what their needs are.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
         );
         
@@ -543,6 +564,27 @@ export default function NewProjectPage() {
                   </FormControl>
                   <FormDescription>
                     Include any additional budget constraints or considerations.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="additionalNotes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Additional Notes</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Any other information you'd like to share about your project"
+                      className="min-h-[100px]"
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Share any additional details that might help us understand your project better.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -637,7 +679,10 @@ export default function NewProjectPage() {
                               Submitting...
                             </>
                           ) : currentStep === totalSteps ? (
-                            "Submit Project"
+                            <>
+                              Submit Project
+                              <CheckCircle className="ml-2 h-4 w-4" />
+                            </>
                           ) : (
                             <>
                               Next
