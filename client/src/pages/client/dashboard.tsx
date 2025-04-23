@@ -109,176 +109,29 @@ function OnboardingState({ client }: { client?: Client }) {
 function NoProjectsState() {
   const { user } = useAuth();
   const greeting = getTimeBasedGreeting();
-  const currentDate = new Date();
-  const formattedDate = format(currentDate, "EEEE, MMMM d, yyyy");
   
   return (
-    <div className="mt-6 space-y-6">
-      {/* Welcome Banner with Personal Greeting */}
-      <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 overflow-hidden">
-        <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-blue-100 to-transparent opacity-50"></div>
-        <CardContent className="py-8 px-6 relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-start">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                {greeting}, {user?.name?.split(" ")[0]}!
-              </h2>
-              <p className="text-gray-600 mb-4">
-                {formattedDate}
-              </p>
-              <p className="text-base text-gray-700 max-w-xl mb-6">
-                Your profile has been completed successfully. Welcome to your personalized TASKR dashboard!
-              </p>
-              
-              <div className="mt-4 flex flex-col sm:flex-row items-start gap-4">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
-                  <Link href="/client/projects/new">
-                    <span className="flex items-center">
-                      <PlusCircle className="mr-2 h-5 w-5" /> Start a Project
-                    </span>
-                  </Link>
-                </Button>
-                
-                <Button size="lg" variant="outline">
-                  <Link href="/client/messages">
-                    <span className="flex items-center">
-                      Contact Us
-                    </span>
-                  </Link>
-                </Button>
-              </div>
-            </div>
-            <div className="hidden md:flex mt-4 md:mt-0">
-              <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center">
-                <svg
-                  className="h-12 w-12 text-blue-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                  />
-                </svg>
-              </div>
-            </div>
+    <div className="mt-6">
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6">
+            <PlusCircle className="h-10 w-10 text-blue-600" />
           </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {greeting}, {user?.name?.split(" ")[0]}!
+          </h2>
+          <p className="text-lg text-gray-600 max-w-md mb-8">
+            Ready to begin? Start your first project to get things rolling.
+          </p>
+          <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Link href="/client/projects/new">
+              <span className="flex items-center">
+                <PlusCircle className="mr-2 h-5 w-5" /> Start a Project
+              </span>
+            </Link>
+          </Button>
         </CardContent>
       </Card>
-      
-      {/* Quick Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Projects</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <div className="mr-4 rounded-full p-2 bg-blue-50">
-                <FileText className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">0</div>
-                <div className="text-sm text-gray-500">Active Projects</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Documents</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <div className="mr-4 rounded-full p-2 bg-amber-50">
-                <FileText className="h-6 w-6 text-amber-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">0</div>
-                <div className="text-sm text-gray-500">Shared Documents</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Account Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <div className="mr-4 rounded-full p-2 bg-green-50">
-                <CheckCircle2 className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <div className="text-lg font-semibold text-green-600">Active</div>
-                <div className="text-sm text-gray-500">Profile Complete</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Recent Activity & Dashboard Info */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Your latest actions and updates</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8">
-              <div className="mx-auto w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <Clock className="h-6 w-6 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-700">No Activity Yet</h3>
-              <p className="text-gray-500 mt-2">
-                Your activity will appear here once you start interacting with the system
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Dashboard Guide</CardTitle>
-            <CardDescription>Getting started with your client portal</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-4">
-              <li className="flex items-start">
-                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center mr-3 mt-0.5">
-                  <span className="text-sm font-medium text-blue-800">1</span>
-                </div>
-                <p className="text-gray-600">Submit your first project request with detailed requirements</p>
-              </li>
-              <li className="flex items-start">
-                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center mr-3 mt-0.5">
-                  <span className="text-sm font-medium text-blue-800">2</span>
-                </div>
-                <p className="text-gray-600">Track your project's progress through each development stage</p>
-              </li>
-              <li className="flex items-start">
-                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center mr-3 mt-0.5">
-                  <span className="text-sm font-medium text-blue-800">3</span>
-                </div>
-                <p className="text-gray-600">Communicate directly with your project team and review deliverables</p>
-              </li>
-              <li className="flex items-start">
-                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center mr-3 mt-0.5">
-                  <span className="text-sm font-medium text-blue-800">4</span>
-                </div>
-                <p className="text-gray-600">Access and manage all project documents securely in one place</p>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }
