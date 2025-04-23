@@ -47,8 +47,8 @@ export function Header({ toggleMobileNav }: HeaderProps) {
             </button>
 
             <div className="flex-shrink-0 flex items-center ml-4 lg:ml-0">
-              <Link href="/">
-                <a className="text-xl font-bold text-slate-900">TASKR</a>
+              <Link href="/" className="text-xl font-bold text-slate-900">
+                TASKR
               </Link>
             </div>
           </div>
@@ -99,10 +99,8 @@ export function Header({ toggleMobileNav }: HeaderProps) {
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="justify-center" asChild>
-                    <Link href="/notifications">
-                      <a className="w-full text-center text-sm font-medium text-primary">
-                        View all notifications
-                      </a>
+                    <Link href="/notifications" className="w-full text-center text-sm font-medium text-primary">
+                      View all notifications
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -127,13 +125,13 @@ export function Header({ toggleMobileNav }: HeaderProps) {
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/profile">
-                      <a className="cursor-pointer">Profile</a>
+                    <Link href="/profile" className="cursor-pointer w-full">
+                      Profile
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/settings">
-                      <a className="cursor-pointer">Settings</a>
+                    <Link href="/settings" className="cursor-pointer w-full">
+                      Settings
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />

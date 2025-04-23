@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
-import { ProgressSteps } from "@/components/ui/progress-steps";
+import { ProgressSteps } from "@/components/progress-steps";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -181,7 +181,7 @@ export function ClientOnboardingForm({ clientId }: { clientId: number }) {
           
           // Redirect to dashboard
           setTimeout(() => {
-            navigate("/dashboard");
+            navigate("/client/dashboard");
           }, 500);
         });
       } else {
@@ -234,28 +234,28 @@ export function ClientOnboardingForm({ clientId }: { clientId: number }) {
       id: "basic_info",
       name: "Basic Info",
       status: findPhaseData("basic_info")
-        ? "complete"
+        ? "complete" as const
         : currentPhase === "basic_info"
-        ? "current"
-        : "upcoming",
+        ? "current" as const
+        : "upcoming" as const,
     },
     {
       id: "project_details",
       name: "Project Details",
       status: findPhaseData("project_details")
-        ? "complete"
+        ? "complete" as const
         : currentPhase === "project_details"
-        ? "current"
-        : "upcoming",
+        ? "current" as const
+        : "upcoming" as const,
     },
     {
       id: "company_profile",
       name: "Company Profile",
       status: findPhaseData("company_profile")
-        ? "complete"
+        ? "complete" as const
         : currentPhase === "company_profile"
-        ? "current"
-        : "upcoming",
+        ? "current" as const
+        : "upcoming" as const,
     },
   ];
 
