@@ -70,7 +70,7 @@ export default function NewProjectPage() {
   const { toast } = useToast();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 4;
+  const totalSteps = 5; // Added a confirmation step
 
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
@@ -125,7 +125,7 @@ export default function NewProjectPage() {
       });
       
       // Redirect to projects page
-      navigate("/projects");
+      navigate("/client/projects");
     },
     onError: (error: Error) => {
       toast({
@@ -140,6 +140,12 @@ export default function NewProjectPage() {
     // Get fields for the current step
     const fieldsToValidate = getFieldsForStep(currentStep);
     
+    // If we're on confirmation step, no validation needed
+    if (currentStep === 5) {
+      form.handleSubmit(onSubmit)();
+      return;
+    }
+    
     // Validate only the fields in the current step
     const result = await form.trigger(fieldsToValidate as any);
     
@@ -147,9 +153,6 @@ export default function NewProjectPage() {
       if (currentStep < totalSteps) {
         setCurrentStep(currentStep + 1);
         window.scrollTo(0, 0);
-      } else {
-        // Submit form on the last step
-        form.handleSubmit(onSubmit)();
       }
     }
   };
@@ -619,7 +622,7 @@ export default function NewProjectPage() {
               <div className="mb-8">
                 <Button
                   variant="ghost"
-                  onClick={() => navigate("/projects")}
+                  onClick={() => navigate("/client/projects")}
                   className="mb-4"
                 >
                   <ChevronLeft className="mr-2 h-4 w-4" />
@@ -648,6 +651,7 @@ export default function NewProjectPage() {
                   <span>Existing Materials</span>
                   <span>Goals & Timeline</span>
                   <span>Budget</span>
+                  <span>Confirm</span>
                 </div>
               </div>
 
