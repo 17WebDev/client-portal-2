@@ -559,15 +559,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create new project
-  app.post("/api/projects", isAdmin, async (req, res) => {
+  app.post("/api/projects", isAuthenticated, async (req, res) => {
     try {
+      // For client users, ensure they can only create projects for themselves
+      if (req.user.role !== "admin") {
+        const userClient = await storage.getClientByUserId(req.user.id);
+        if (!userClient) {
+          return res.status(403).json({ message: "Client profile not found. Please complete your profile first." });
+        }
+        
+        // Override clientId with the authenticated user's client id
+        req.body.clientId = userClient.id;
+        
+        // Set initial status
+        req.body.status = "REVIEWING";
+      }
+      
+      // Add timestamps
+      req.body.submittedAt = new Date();
+      req.body.createdAt = new Date();
+      
       const projectData = insertProjectSchema.parse(req.body);
       const project = await storage.createProject(projectData);
+      
+      // Initialize the project status system after creation
+      await projectStatusService.initializeProjectStatus(project.id, "REVIEWING", req.user.id);
+      
       res.status(201).json(project);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid project data", errors: error.errors });
       }
+      console.error("Error creating project:", error);
       res.status(500).json({ message: "Failed to create project" });
     }
   });

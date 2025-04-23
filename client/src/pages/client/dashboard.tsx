@@ -107,36 +107,74 @@ function OnboardingState({ client }: { client?: Client }) {
 
 function NoProjectsState() {
   return (
-    <div className="mt-6">
+    <div className="mt-6 space-y-6">
       <Card>
         <CardContent className="py-12 text-center">
-          <svg
-            className="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1}
-              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-            />
-          </svg>
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No projects yet</h3>
-          <p className="mt-1 text-sm text-gray-500">
-            Your onboarding is complete, but you don't have any active projects yet.
+          <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+            <svg
+              className="h-8 w-8 text-blue-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+              />
+            </svg>
+          </div>
+          <h3 className="mt-4 text-xl font-semibold text-gray-900">Welcome to TASKR!</h3>
+          <p className="mt-2 text-base text-gray-600 max-w-md mx-auto">
+            Your centralized platform for seamless project management and collaboration. 
+            Get started by submitting your first project.
           </p>
-          <div className="mt-6">
-            <Button>
+          
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+              <Link href="/projects/new">
+                <span className="flex items-center">
+                  Submit Your First Project <ArrowRight className="ml-2 h-5 w-5" />
+                </span>
+              </Link>
+            </Button>
+            
+            <Button size="lg" variant="outline">
               <Link href="/client/messages">
                 <span className="flex items-center">
-                  Contact us <ArrowRight className="ml-2 h-4 w-4" />
+                  Contact Us
                 </span>
               </Link>
             </Button>
           </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardContent className="p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">What happens after project submission?</h3>
+          <ol className="space-y-4">
+            <li className="flex items-start">
+              <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center mr-3 mt-0.5">
+                <span className="text-sm font-medium text-blue-800">1</span>
+              </div>
+              <p className="text-gray-600">Our team will review your project details</p>
+            </li>
+            <li className="flex items-start">
+              <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center mr-3 mt-0.5">
+                <span className="text-sm font-medium text-blue-800">2</span>
+              </div>
+              <p className="text-gray-600">We'll schedule an initial consultation to discuss requirements</p>
+            </li>
+            <li className="flex items-start">
+              <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center mr-3 mt-0.5">
+                <span className="text-sm font-medium text-blue-800">3</span>
+              </div>
+              <p className="text-gray-600">You'll receive a proposal with timeline and cost estimates</p>
+            </li>
+          </ol>
         </CardContent>
       </Card>
     </div>
