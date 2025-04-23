@@ -74,7 +74,7 @@ export function Sidebar({ className }: SidebarProps) {
               {!isAdmin && (
                 <div className="space-y-1 pb-2">
                   <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Client Portal
+                    TASKR
                   </h3>
 
                   <NavItem

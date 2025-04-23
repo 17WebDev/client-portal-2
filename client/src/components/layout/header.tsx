@@ -48,7 +48,7 @@ export function Header({ toggleMobileNav }: HeaderProps) {
 
             <div className="flex-shrink-0 flex items-center ml-4 lg:ml-0">
               <Link href="/">
-                <a className="text-xl font-bold text-slate-900">ConsultPro</a>
+                <a className="text-xl font-bold text-slate-900">TASKR</a>
               </Link>
             </div>
           </div>

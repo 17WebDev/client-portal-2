@@ -34,7 +34,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
       {/* Sidebar */}
       <div className="relative flex flex-col w-full max-w-xs pb-12 overflow-y-auto bg-white">
         <div className="flex items-center justify-between px-4 pt-5 pb-2">
-          <div className="text-xl font-bold text-slate-900">ConsultPro</div>
+          <div className="text-xl font-bold text-slate-900">TASKR</div>
           <button
             type="button"
             className="-mr-2 inline-flex items-center justify-center rounded-md p-2 text-gray-500"
@@ -90,7 +90,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
           {!isAdmin && (
             <div className="space-y-1 pb-2">
               <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Client Portal
+                TASKR
               </h3>
 
               <NavItem

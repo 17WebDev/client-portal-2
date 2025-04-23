@@ -97,9 +97,9 @@ export default function AuthPage() {
         {/* Left side: Auth form */}
         <div className="flex-1 mb-8 lg:mb-0 lg:max-w-md lg:mr-8">
           <div className="text-center mb-6">
-            <h1 className="text-3xl font-extrabold text-gray-900">Client Portal</h1>
+            <h1 className="text-3xl font-extrabold text-gray-900">TASKR</h1>
             <p className="mt-2 text-sm text-gray-600">
-              Your all-in-one client onboarding and project management portal
+              Your all-in-one client onboarding and project management solution
             </p>
           </div>
 
@@ -335,7 +335,7 @@ export default function AuthPage() {
         {/* Right side: Hero section */}
         <div className="flex-1 bg-blue-600 text-white rounded-lg shadow-xl overflow-hidden hidden lg:block">
           <div className="p-12 h-full flex flex-col justify-center">
-            <h2 className="text-3xl font-bold mb-6">Welcome to Client Portal</h2>
+            <h2 className="text-3xl font-bold mb-6">Welcome to TASKR</h2>
             <p className="text-lg mb-6">
               The comprehensive platform for managing your consulting projects from start to finish.
             </p>
@@ -356,8 +356,8 @@ export default function AuthPage() {
                   />
                 </svg>
                 <span>
-                  <strong className="block text-blue-200">Streamlined Onboarding</strong>
-                  Quick and easy process to get your project started
+                  <strong className="block text-blue-200">Complete Project Transparency</strong>
+                  Real-time visibility into project status, progress, and next steps at any time, eliminating guesswork and providing confidence in your project's direction.
                 </span>
               </li>
               <li className="flex items-start">
@@ -376,8 +376,8 @@ export default function AuthPage() {
                   />
                 </svg>
                 <span>
-                  <strong className="block text-blue-200">Real-time Project Updates</strong>
-                  Stay informed with the latest progress on your projects
+                  <strong className="block text-blue-200">Streamlined Communication & Documentation</strong>
+                  All conversations, files, and decisions centralized in one secure place, reducing email overload and ensuring nothing gets lost or overlooked.
                 </span>
               </li>
               <li className="flex items-start">
@@ -396,28 +396,8 @@ export default function AuthPage() {
                   />
                 </svg>
                 <span>
-                  <strong className="block text-blue-200">Secure Document Management</strong>
-                  Access and sign important documents all in one place
-                </span>
-              </li>
-              <li className="flex items-start">
-                <svg
-                  className="h-6 w-6 text-blue-300 mr-2"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span>
-                  <strong className="block text-blue-200">Direct Communication</strong>
-                  Seamless interaction with your project team
+                  <strong className="block text-blue-200">Personalized Control & Peace of Mind</strong>
+                  Customizable notifications, clear action items, and 24/7 access to your project information from anywhere, putting you in control while knowing everything is on track.
                 </span>
               </li>
             </ul>

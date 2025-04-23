@@ -282,7 +282,7 @@ export default function ProjectsPage() {
                   <div className="flex justify-between items-start">
                     <div>
                       <CardTitle>Mobile App Development</CardTitle>
-                      <CardDescription>iOS and Android client portal app</CardDescription>
+                      <CardDescription>iOS and Android TASKR app</CardDescription>
                     </div>
                     <Badge className="bg-blue-500">Planning</Badge>
                   </div>
@@ -320,7 +320,7 @@ export default function ProjectsPage() {
                   <div className="flex justify-between items-start">
                     <div>
                       <CardTitle>CRM Integration</CardTitle>
-                      <CardDescription>Connect existing systems with new portal</CardDescription>
+                      <CardDescription>Connect existing systems with TASKR</CardDescription>
                     </div>
                     <Badge className="bg-green-500">Completed</Badge>
                   </div>
