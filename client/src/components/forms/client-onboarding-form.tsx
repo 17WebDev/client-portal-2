@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { ClientOnboardingStatus } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 import {
   Form,
@@ -66,6 +67,7 @@ const companyProfileSchema = z.object({
 export function ClientOnboardingForm({ clientId }: { clientId: number }) {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [, navigate] = useLocation();
   const [currentPhase, setCurrentPhase] = useState<string>("basic_info");
 
   // Fetch onboarding status and existing data
@@ -152,29 +154,48 @@ export function ClientOnboardingForm({ clientId }: { clientId: number }) {
     mutationFn: async ({
       phase,
       data,
+      isCompanyProfileSubmission = false,
     }: {
       phase: string;
       data: Record<string, any>;
+      isCompanyProfileSubmission?: boolean;
     }) => {
       const response = await apiRequest("POST", `/api/clients/${clientId}/onboarding-data`, {
         phase,
         data,
       });
-      return response.json();
+      return { result: await response.json(), isCompanyProfileSubmission };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [`/api/clients/${clientId}/onboarding-status`] });
       queryClient.invalidateQueries({ queryKey: [`/api/clients/${clientId}`] });
-      toast({
-        title: "Progress saved",
-        description: "Your information has been saved successfully.",
-      });
-
-      // Advance to next phase
-      if (currentPhase === "basic_info") {
-        setCurrentPhase("project_details");
-      } else if (currentPhase === "project_details") {
-        setCurrentPhase("company_profile");
+      
+      // If this is the company profile submission (final step)
+      if (data.isCompanyProfileSubmission) {
+        // Complete onboarding update
+        apiRequest("PUT", `/api/clients/${clientId}/complete-onboarding`, {}).then(() => {
+          toast({
+            title: "Onboarding Complete!",
+            description: "Your profile is now complete. Welcome to TASKR!",
+          });
+          
+          // Redirect to dashboard
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 500);
+        });
+      } else {
+        toast({
+          title: "Progress saved",
+          description: "Your information has been saved successfully.",
+        });
+        
+        // Advance to next phase for non-final steps
+        if (currentPhase === "basic_info") {
+          setCurrentPhase("project_details");
+        } else if (currentPhase === "project_details") {
+          setCurrentPhase("company_profile");
+        }
       }
     },
     onError: () => {
@@ -196,7 +217,11 @@ export function ClientOnboardingForm({ clientId }: { clientId: number }) {
   };
 
   const handleCompanyProfileSubmit = (data: z.infer<typeof companyProfileSchema>) => {
-    saveDataMutation.mutate({ phase: "company_profile", data });
+    saveDataMutation.mutate({ 
+      phase: "company_profile", 
+      data,
+      isCompanyProfileSubmission: true // Flag to indicate this is the final submission
+    });
   };
 
   if (isLoading) {
