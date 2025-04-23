@@ -533,7 +533,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update client onboarding status
       const updatedClient = await storage.updateClient(clientId, {
         onboardingStatus: "completed",
-        onboardingCompletedAt: new Date()
+        updatedAt: new Date() // Use updatedAt instead of onboardingCompletedAt
       });
       
       res.status(200).json(updatedClient);
