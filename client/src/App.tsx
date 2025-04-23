@@ -56,15 +56,14 @@ function Router() {
       <ProtectedRoute path="/settings" component={Settings} />
       
       {/* Default Routes */}
-      <Route path="/" component={() => {
-        // Redirect to appropriate dashboard based on user role (handled by protected route)
-        return (
-          <ProtectedRoute 
-            path="/" 
-            component={() => <div>Redirecting...</div>} 
-          />
-        );
-      }} />
+      <Route path="/">
+        <Redirect to="/client/dashboard" />
+      </Route>
+      
+      {/* Dashboard shortcut */}
+      <Route path="/dashboard">
+        <Redirect to="/client/dashboard" />
+      </Route>
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
