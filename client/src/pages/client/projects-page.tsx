@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Loader2, Grid, List, Filter, SortDesc, Search } from "lucide-react";
+import { Loader2, Grid, List, Filter, SortDesc, Search, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { 
@@ -130,10 +130,20 @@ export default function ProjectsPage() {
       <div className="flex flex-col space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-          <Button variant="outline" onClick={toggleViewType}>
-            {viewType === "grid" ? <List size={18} /> : <Grid size={18} />}
-            <span className="ml-2">{viewType === "grid" ? "List View" : "Grid View"}</span>
-          </Button>
+          <div className="flex gap-3">
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              <Link href="/projects/new">
+                <span className="flex items-center">
+                  <Plus size={18} className="mr-2" />
+                  Submit New Project
+                </span>
+              </Link>
+            </Button>
+            <Button variant="outline" onClick={toggleViewType}>
+              {viewType === "grid" ? <List size={18} /> : <Grid size={18} />}
+              <span className="ml-2">{viewType === "grid" ? "List View" : "Grid View"}</span>
+            </Button>
+          </div>
         </div>
 
         {/* Quick Stats */}
