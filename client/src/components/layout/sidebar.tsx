@@ -88,7 +88,7 @@ export function Sidebar({ className }: SidebarProps) {
                     href="/client/projects"
                     icon={<FolderOpen className="mr-3 h-5 w-5" />}
                     label="My Projects"
-                    isActive={location === "/client/projects"}
+                    isActive={location.startsWith("/client/projects")}
                   />
 
                   <NavItem

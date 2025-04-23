@@ -177,11 +177,13 @@ function NoProjectsState() {
             You don't have any active projects at the moment.
           </p>
           <div className="mt-6">
-            <Button onClick={() => window.location.href = "/client/projects/new"}>
-              <span className="flex items-center">
-                <PlusCircle className="mr-2 h-5 w-5" /> Start a Project
-              </span>
-            </Button>
+            <Link href="/client/projects/new">
+              <Button>
+                <span className="flex items-center">
+                  <PlusCircle className="mr-2 h-5 w-5" /> Start a Project
+                </span>
+              </Button>
+            </Link>
           </div>
         </CardContent>
       </Card>
