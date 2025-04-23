@@ -92,7 +92,7 @@ function OnboardingState({ client }: { client?: Client }) {
     <div className="mt-6">
       <Card className="mb-6">
         <CardContent className="pt-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Welcome to Client Portal!</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Welcome to TASKR!</h2>
           <p className="text-gray-600 mb-4">
             Before we begin working on your project, we need to collect some important information.
             Please complete the onboarding process below to get started.

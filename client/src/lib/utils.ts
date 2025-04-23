@@ -64,8 +64,6 @@ export function getStatusColor(status: string): string {
     
     // Client onboarding statuses
     "pending": "slate",
-    "in_progress": "amber",
-    "completed": "green",
     
     // Pipeline stages
     "qualifying_call": "blue",
