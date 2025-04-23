@@ -29,7 +29,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarIcon, Loader2, ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
@@ -38,17 +38,28 @@ import { useAuth } from "@/hooks/use-auth";
 
 // Project submission schema
 const projectSchema = z.object({
+  // Basic Information (Step 1)
   name: z.string().min(3, "Project name must be at least 3 characters"),
   description: z.string().min(20, "Please provide a more detailed description"),
+  projectType: z.string().optional(),
+  
+  // Existing Materials (Step 2)
   existingApp: z.boolean().default(false),
   applicationType: z.string().optional(),
   existingMaterialsLinks: z.string().optional(),
+  technicalRequirements: z.string().optional(),
+  
+  // Goals & Timeline (Step 3)
   idealCompletionDate: z.date().optional(),
   projectGoal: z.string().min(30, "Please provide a detailed project goal"),
   expectedBusinessImpact: z.string().min(30, "Please describe the expected business impact"),
   successCriteria: z.string().min(30, "Please define success criteria for this project"),
+  userNeeds: z.string().optional(),
+  
+  // Budget & Additional Info (Step 4)
   budgetRange: z.string().optional(),
   budgetNotes: z.string().optional(),
+  additionalNotes: z.string().optional(),
 });
 
 type ProjectFormData = z.infer<typeof projectSchema>;
@@ -64,17 +75,28 @@ export default function NewProjectPage() {
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
+      // Basic Information
       name: "",
       description: "",
+      projectType: undefined,
+      
+      // Existing Materials
       existingApp: false,
       applicationType: undefined,
       existingMaterialsLinks: "",
+      technicalRequirements: "",
+      
+      // Goals & Timeline
       idealCompletionDate: undefined,
       projectGoal: "",
       expectedBusinessImpact: "",
       successCriteria: "",
+      userNeeds: "",
+      
+      // Budget & Additional Info
       budgetRange: "",
       budgetNotes: "",
+      additionalNotes: "",
     },
   });
 
@@ -147,13 +169,13 @@ export default function NewProjectPage() {
   const getFieldsForStep = (step: number): (keyof ProjectFormData)[] => {
     switch (step) {
       case 1:
-        return ["name", "description"];
+        return ["name", "description", "projectType"];
       case 2:
-        return ["existingApp", "applicationType", "existingMaterialsLinks"];
+        return ["existingApp", "applicationType", "existingMaterialsLinks", "technicalRequirements"];
       case 3:
-        return ["idealCompletionDate", "projectGoal", "expectedBusinessImpact", "successCriteria"];
+        return ["idealCompletionDate", "projectGoal", "expectedBusinessImpact", "successCriteria", "userNeeds"];
       case 4:
-        return ["budgetRange", "budgetNotes"];
+        return ["budgetRange", "budgetNotes", "additionalNotes"];
       default:
         return [];
     }
@@ -180,6 +202,40 @@ export default function NewProjectPage() {
                   </FormControl>
                   <FormDescription>
                     A concise name that describes your project.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="projectType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Project Type</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select project type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="mobile_app">Mobile App</SelectItem>
+                      <SelectItem value="web_application">Web Application</SelectItem>
+                      <SelectItem value="desktop_software">Desktop Software</SelectItem>
+                      <SelectItem value="website">Website</SelectItem>
+                      <SelectItem value="ai_solution">AI Solution</SelectItem>
+                      <SelectItem value="integration">System Integration</SelectItem>
+                      <SelectItem value="consulting">Technical Consulting</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Select the type of project you're looking to build.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -286,6 +342,27 @@ export default function NewProjectPage() {
                   </FormControl>
                   <FormDescription>
                     Provide links to any existing designs, documentation, or resources.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="technicalRequirements"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Technical Requirements</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Describe any specific technical requirements, frameworks, APIs, or technologies you need for this project."
+                      className="min-h-[100px]"
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    List any specific technical requirements or preferred technologies for your project.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
