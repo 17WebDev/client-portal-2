@@ -123,13 +123,13 @@ function NoProjectsState() {
           <p className="text-lg text-gray-600 max-w-md mb-8">
             Ready to begin? Start your first project to get things rolling.
           </p>
-          <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
-            <Link href="/client/projects/new">
+          <Link href="/client/projects/new">
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
               <span className="flex items-center">
                 <PlusCircle className="mr-2 h-5 w-5" /> Start a Project
               </span>
-            </Link>
-          </Button>
+            </Button>
+          </Link>
         </CardContent>
       </Card>
     </div>
@@ -172,21 +172,21 @@ function ProjectOverview({ mainProject }: { mainProject: Project }) {
               </div>
               
               <div className="mt-4 flex flex-col sm:flex-row items-start gap-4">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
-                  <Link href={`/projects/${mainProject.id}`}>
+                <Link href={`/projects/${mainProject.id}`}>
+                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
                     <span className="flex items-center">
                       View Project Details
                     </span>
-                  </Link>
-                </Button>
+                  </Button>
+                </Link>
                 
-                <Button size="lg" variant="outline">
-                  <Link href="/client/projects/new">
+                <Link href="/client/projects/new">
+                  <Button size="lg" variant="outline">
                     <span className="flex items-center">
                       <PlusCircle className="mr-2 h-5 w-5" /> Start a Project
                     </span>
-                  </Link>
-                </Button>
+                  </Button>
+                </Link>
               </div>
             </div>
             <div className="hidden md:flex mt-4 md:mt-0">

@@ -158,9 +158,9 @@ interface NavItemProps {
 function NavItem({ href, icon, label, isActive, onClick }: NavItemProps) {
   return (
     <Link href={href}>
-      <a
+      <div
         className={cn(
-          "group flex items-center px-3 py-2 text-sm font-medium rounded-md",
+          "group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer",
           isActive
             ? "bg-blue-50 text-blue-700"
             : "text-gray-700 hover:text-blue-700 hover:bg-gray-50"
@@ -175,7 +175,7 @@ function NavItem({ href, icon, label, isActive, onClick }: NavItemProps) {
           {icon}
         </span>
         {label}
-      </a>
+      </div>
     </Link>
   );
 }
