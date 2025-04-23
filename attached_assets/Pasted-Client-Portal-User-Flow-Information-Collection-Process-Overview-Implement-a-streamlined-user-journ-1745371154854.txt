@@ -1,0 +1,221 @@
+Client Portal User Flow & Information Collection Process
+Overview
+Implement a streamlined user journey that collects only essential information during initial signup, then redirects users to the main dashboard (formerly "Overview"). Project-specific details should only be collected when a user actively submits a new project from the dashboard or Projects page.
+Signup & Initial Onboarding Flow
+1. User Signup
+
+Collect minimal information for account creation:
+
+Name
+Email address
+Password
+Phone number (required)
+
+
+
+2. Company Profile Collection
+
+Immediately after signup, prompt user to complete company profile:
+
+Company name
+Legal entity name
+Legal business address
+User's role/title
+Company size (required)
+Industry (required)
+How did you hear about us? (required)
+Company logo (optional)
+
+
+
+3. Redirect to Dashboard
+
+Upon completion of company profile, automatically redirect user to the "Dashboard" page (renamed from "Overview")
+Display a welcome message with brief portal orientation
+Show empty states with clear call-to-action buttons for submitting first project
+
+Dashboard Design (Renamed from "Overview")
+Main Components
+
+Welcome section with personalized greeting
+Quick stats overview (even if empty initially)
+Recent activity feed (or helpful empty state for new users)
+Prominent "Submit New Project" button
+Navigation to other sections (My Projects, Documents, Settings, etc.)
+
+Empty State Design
+For new users without any projects:
+
+Friendly welcome message explaining the portal benefits
+Visual guide to getting started
+Prominent "Submit Your First Project" button
+Brief explanation of what happens after project submission
+
+Project Submission Flow
+1. Initiate Project Submission
+
+User clicks "Submit New Project" from Dashboard or Projects page
+Present modal or dedicated page for project submission
+
+2. Project Details Collection
+Only at this point should you collect project-specific information:
+
+Project name
+Project description
+Existing app (dropdown: Yes/No)
+If Yes to existing app, what kind of application (dropdown: Web, Mobile, Both)
+Links to existing materials (example: Figma, G-Drive Folder, staging environments, etc.)
+Ideal Completion Date (date picker)
+Project Goal (with placeholder text: "Example: The goal of our MVP build is to develop a software solution that streamlines business operations while significantly reducing manual processes in order to shorten the time needed to complete the operations.")
+Expected Business Impact (with placeholder text: "Example: Implementing this Integrated Role would significantly enhance our technical capabilities, allowing us to accelerate product development by approximately 30%.")
+Success Criteria (with placeholder text: "Example: Successful engagement would be to build feature X, which allows users to do Y, which will increase revenue by Z.")
+Budget information
+File attachments (if needed)
+Any other project-specific details
+
+3. Confirmation & Redirect
+
+After successful project submission, show confirmation
+Redirect user back to the Projects page with their new project visible
+Display appropriate "in review" status for the new project
+
+Technical Implementation Notes
+URL Routes
+
+/signup - Initial signup page
+/onboarding - Company profile collection
+/dashboard - Main dashboard (renamed from overview)
+/projects - Projects listing page
+/projects/new - New project submission form
+/projects/:id - Individual project detail page
+
+Form Handling
+
+Implement multi-step forms with progress indicators
+Save form data incrementally to prevent loss if user navigates away
+Validate each section before allowing progression to next step
+Provide clear error messages for invalid inputs
+
+Redirects
+
+After signup → company profile collection
+After company profile completion → dashboard
+After project submission → projects page
+
+State Management
+
+Store authentication state in secure HTTP-only cookies
+Maintain user and company information in application state
+Cache project list data for quick access
+
+Data Models
+User & Company Combined Model
+javascript{
+  id: String,
+  email: String,
+  name: String,
+  phone: String, // Required field
+  role: String,
+  company: {
+    name: String,
+    legalName: String,
+    address: {
+      street: String,
+      city: String,
+      state: String,
+      zipCode: String,
+      country: String
+    },
+    size: String, // Required
+    industry: String, // Required
+    referralSource: String, // How did you hear about us?
+    logo: String // URL to uploaded logo
+  },
+  createdAt: Date,
+  lastLogin: Date
+}
+Project Model
+javascript{
+  id: String,
+  clientId: String,
+  name: String,
+  description: String,
+  existingApp: Boolean,
+  applicationType: {
+    type: String,
+    enum: ['Web', 'Mobile', 'Both'],
+    required: function() { return this.existingApp === true; }
+  },
+  existingMaterialsLinks: [String],
+  idealCompletionDate: Date,
+  projectGoal: String,
+  expectedBusinessImpact: String,
+  successCriteria: String,
+  budget: {
+    range: String,
+    notes: String
+  },
+  attachments: [
+    {
+      name: String,
+      url: String,
+      type: String,
+      size: Number
+    }
+  ],
+  status: {
+    current: {
+      code: String, // Initial value: "REVIEWING"
+      since: Date
+    }
+  },
+  submittedAt: Date
+}
+API Endpoints
+Authentication & Onboarding
+
+POST /api/auth/signup - Create new user account
+PUT /api/users/company-profile - Update company information
+GET /api/users/me - Get current user information
+
+Projects
+
+POST /api/projects - Submit new project
+GET /api/projects - List all client projects
+GET /api/projects/:id - Get specific project details
+
+Implementation Requirements
+
+Streamlined Forms
+
+Keep initial signup and onboarding forms minimal and focused
+Use clear, concise labels and helpful placeholder text
+Divide project submission into logical sections with progress indicators
+
+
+Intuitive Navigation
+
+Clear visual cues for primary actions
+Consistent navigation patterns
+Breadcrumbs for multi-step processes
+
+
+Helpful Empty States
+
+Design engaging, informative empty states for new users
+Clear guidance on next steps
+Visual elements to make empty pages feel intentional rather than broken
+
+
+Proper Redirects
+
+Automatic redirects after form completion
+No dead ends in the user journey
+Remember where users came from for logical back navigation
+
+
+Dashboard Design
+
+Rename "Overview" to "Dashboard" throughout the application
+Design dashboard to be useful even for new users with no projects
+Prominent call-to-action for submitting first project

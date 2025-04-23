@@ -15,7 +15,7 @@ import AdminProjects from "@/pages/admin/projects";
 import AdminAnalytics from "@/pages/admin/analytics";
 
 // Client Pages
-import ClientOverview from "@/pages/client/overview";
+import ClientDashboard from "@/pages/client/dashboard";
 import ClientProjects from "@/pages/client/projects";
 import ClientDocuments from "@/pages/client/documents";
 import ClientMessages from "@/pages/client/messages";
@@ -38,7 +38,7 @@ function Router() {
       <ProtectedRoute path="/admin/analytics" component={AdminAnalytics} adminOnly />
       
       {/* Client Routes */}
-      <ProtectedRoute path="/client/overview" component={ClientOverview} />
+      <ProtectedRoute path="/client/dashboard" component={ClientDashboard} />
       <ProtectedRoute path="/client/projects" component={ClientProjects} />
       <ProtectedRoute path="/client/documents" component={ClientDocuments} />
       <ProtectedRoute path="/client/messages" component={ClientMessages} />
