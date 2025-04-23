@@ -55,7 +55,7 @@ export default function AuthPage() {
       if (user.role === "admin") {
         navigate("/admin/dashboard");
       } else {
-        navigate("/client/overview");
+        navigate("/client/dashboard");
       }
     }
   }, [user, navigate]);

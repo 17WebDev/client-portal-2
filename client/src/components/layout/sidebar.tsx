@@ -78,10 +78,10 @@ export function Sidebar({ className }: SidebarProps) {
                   </h3>
 
                   <NavItem
-                    href="/client/overview"
+                    href="/client/dashboard"
                     icon={<Home className="mr-3 h-5 w-5" />}
-                    label="Overview"
-                    isActive={location === "/client/overview"}
+                    label="Dashboard"
+                    isActive={location === "/client/dashboard"}
                   />
 
                   <NavItem
