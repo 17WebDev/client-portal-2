@@ -510,6 +510,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Complete client onboarding process
+  app.put("/api/clients/:id/complete-onboarding", isAuthenticated, async (req, res) => {
+    try {
+      const clientId = parseInt(req.params.id);
+      
+      // Check permissions
+      if (req.user?.role !== "admin") {
+        // For clients, check if they're updating their own onboarding data
+        const userClient = await storage.getClientByUserId(req.user?.id || 0);
+        if (!userClient || userClient.id !== clientId) {
+          return res.status(403).json({ message: "You don't have permission to update this information" });
+        }
+      }
+      
+      // Get client
+      const client = await storage.getClient(clientId);
+      if (!client) {
+        return res.status(404).json({ message: "Client not found" });
+      }
+      
+      // Update client onboarding status
+      const updatedClient = await storage.updateClient(clientId, {
+        onboardingStatus: "completed",
+        onboardingCompletedAt: new Date()
+      });
+      
+      res.status(200).json(updatedClient);
+    } catch (error: any) {
+      console.error("Error completing onboarding:", error);
+      res.status(500).json({ message: error.message || "Error completing onboarding" });
+    }
+  });
+  
   // PROJECTS ROUTES
   
   // Get all projects
