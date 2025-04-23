@@ -132,9 +132,9 @@ function NoProjectsState() {
               
               <div className="mt-4 flex flex-col sm:flex-row items-start gap-4">
                 <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
-                  <Link href="/projects/new">
+                  <Link href="/client/projects/new">
                     <span className="flex items-center">
-                      <PlusCircle className="mr-2 h-5 w-5" /> Submit New Project
+                      <PlusCircle className="mr-2 h-5 w-5" /> Start a Project
                     </span>
                   </Link>
                 </Button>
@@ -328,9 +328,9 @@ function ProjectOverview({ mainProject }: { mainProject: Project }) {
                 </Button>
                 
                 <Button size="lg" variant="outline">
-                  <Link href="/projects/new">
+                  <Link href="/client/projects/new">
                     <span className="flex items-center">
-                      <PlusCircle className="mr-2 h-5 w-5" /> New Project
+                      <PlusCircle className="mr-2 h-5 w-5" /> Start a Project
                     </span>
                   </Link>
                 </Button>

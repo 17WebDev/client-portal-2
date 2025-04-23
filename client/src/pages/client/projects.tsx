@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Project, Client } from "@/lib/types";
 import { formatDate, getStatusColor, getStatusText } from "@/lib/utils";
@@ -177,7 +177,11 @@ function NoProjectsState() {
           </p>
           <div className="mt-6">
             <Button>
-              Contact Us
+              <Link href="/client/projects/new">
+                <span className="flex items-center">
+                  Start a Project
+                </span>
+              </Link>
             </Button>
           </div>
         </CardContent>
